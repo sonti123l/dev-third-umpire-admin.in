@@ -1,14 +1,14 @@
-import LoginPage from "@/components/auth/LoginPage";
+import DashboardPage from "@/components/dashboard/DashboardPage";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_layout/dashboard/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   return (
     <div>
-      <LoginPage />
+      <DashboardPage />
     </div>
   );
 }
