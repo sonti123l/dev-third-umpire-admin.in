@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LayoutUpdatesIndexRouteImport } from './routes/_layout/updates/index'
 import { Route as LayoutSettingsIndexRouteImport } from './routes/_layout/settings/index'
 import { Route as LayoutDashboardIndexRouteImport } from './routes/_layout/dashboard/index'
+import { Route as DevicesIdInfoIndexRouteImport } from './routes/devices/$id/info/index'
 
 const LayoutRoute = LayoutRouteImport.update({
   id: '/_layout',
@@ -39,18 +40,25 @@ const LayoutDashboardIndexRoute = LayoutDashboardIndexRouteImport.update({
   path: '/dashboard/',
   getParentRoute: () => LayoutRoute,
 } as any)
+const DevicesIdInfoIndexRoute = DevicesIdInfoIndexRouteImport.update({
+  id: '/devices/$id/info/',
+  path: '/devices/$id/info/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard/': typeof LayoutDashboardIndexRoute
   '/settings/': typeof LayoutSettingsIndexRoute
   '/updates/': typeof LayoutUpdatesIndexRoute
+  '/devices/$id/info/': typeof DevicesIdInfoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof LayoutDashboardIndexRoute
   '/settings': typeof LayoutSettingsIndexRoute
   '/updates': typeof LayoutUpdatesIndexRoute
+  '/devices/$id/info': typeof DevicesIdInfoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -59,12 +67,18 @@ export interface FileRoutesById {
   '/_layout/dashboard/': typeof LayoutDashboardIndexRoute
   '/_layout/settings/': typeof LayoutSettingsIndexRoute
   '/_layout/updates/': typeof LayoutUpdatesIndexRoute
+  '/devices/$id/info/': typeof DevicesIdInfoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard/' | '/settings/' | '/updates/'
+  fullPaths:
+    | '/'
+    | '/dashboard/'
+    | '/settings/'
+    | '/updates/'
+    | '/devices/$id/info/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/settings' | '/updates'
+  to: '/' | '/dashboard' | '/settings' | '/updates' | '/devices/$id/info'
   id:
     | '__root__'
     | '/'
@@ -72,11 +86,13 @@ export interface FileRouteTypes {
     | '/_layout/dashboard/'
     | '/_layout/settings/'
     | '/_layout/updates/'
+    | '/devices/$id/info/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LayoutRoute: typeof LayoutRouteWithChildren
+  DevicesIdInfoIndexRoute: typeof DevicesIdInfoIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +132,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardIndexRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/devices/$id/info/': {
+      id: '/devices/$id/info/'
+      path: '/devices/$id/info'
+      fullPath: '/devices/$id/info/'
+      preLoaderRoute: typeof DevicesIdInfoIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -137,6 +160,7 @@ const LayoutRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LayoutRoute: LayoutRouteWithChildren,
+  DevicesIdInfoIndexRoute: DevicesIdInfoIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

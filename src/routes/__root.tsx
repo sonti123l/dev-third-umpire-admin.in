@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import appCss from "../styles.css?url";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "sonner";
 
 const client = new QueryClient();
 
@@ -49,6 +50,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body>
         {children}
         <Scripts />
+        <Toaster />
       </body>
     </html>
   );

@@ -1,5 +1,5 @@
 import prepareURLEncodedParams from "././prepareURLEncodedParams";
-import Cookies from "js-cookie";
+import Cookies from "js-cookie"
 
 interface IAPIResponse {
   success: boolean;
