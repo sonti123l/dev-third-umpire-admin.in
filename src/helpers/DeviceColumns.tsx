@@ -3,6 +3,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { EyeIcon } from "lucide-react";
 import dayjs from "dayjs";
+import AddPeopleIcon from "@/icons/add-people-icon";
 
 type devicesList = {
   site_name: string;
@@ -11,7 +12,24 @@ type devicesList = {
   created_at: string;
   status: string;
   id: string;
+  add: string;
 };
+
+type Actions = {
+  name: string;
+  icon: any;
+};
+
+const actions: Actions[] = [
+  {
+    name: "View",
+    icon: EyeIcon,
+  },
+  {
+    name: "Add People",
+    icon: AddPeopleIcon,
+  },
+];
 
 const DeviceColumns = () => {
   const navigate = useNavigate();
@@ -61,9 +79,19 @@ const DeviceColumns = () => {
       cell: (info) => {
         const value = info.row.original;
         return (
-          <Button onClick={() => navigate({ to: `/devices/${value.id}/info` })}>
-            <EyeIcon />
-          </Button>
+          <div>
+            {actions?.length > 0 &&
+              actions?.map((eachAction: Actions) => (
+                <Button
+                  onClick={() =>
+                    eachAction?.name === "View" &&
+                    navigate({ to: `/devices/${value.id}/info` })
+                  }
+                >
+                  <eachAction.icon />
+                </Button>
+              ))}
+          </div>
         );
       },
     }),
