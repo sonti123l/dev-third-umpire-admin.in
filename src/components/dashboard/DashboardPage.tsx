@@ -14,7 +14,7 @@ export default function DashboardPage() {
 
   // const { data }
   const [fotaForm, setFotaForm] = useState<FotaDetails>({
-    device_id: 0,
+    device_id: 11,
     device_old_version: "",
     device_new_version: "",
     web_old_version: "",
@@ -87,6 +87,7 @@ export default function DashboardPage() {
               value={fotaForm.device_id}
               onChange={handleChange}
               className={inputClass}
+              disabled
             />
           </div>
         </div>
