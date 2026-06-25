@@ -1,14 +1,14 @@
-import LoginPage from "@/components/auth/LoginPage";
+import DevicesPage from "@/components/devices/DevicesPage";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/devices/$id/info/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   return (
     <div>
-      <LoginPage />
+      <DevicesPage />
     </div>
   );
 }

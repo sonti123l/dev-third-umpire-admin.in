@@ -1,0 +1,15 @@
+import Layout from "@/components/layout/Layout";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/_layout")({
+  component: RouteComponent,
+});
+
+function RouteComponent() {
+  return (
+    <div>
+      <Layout />
+      <Outlet />
+    </div>
+  );
+}
