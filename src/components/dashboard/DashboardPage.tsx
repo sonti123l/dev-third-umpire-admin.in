@@ -87,7 +87,6 @@ export default function DashboardPage() {
               value={fotaForm.device_id}
               onChange={handleChange}
               className={inputClass}
-              disabled
             />
           </div>
         </div>
