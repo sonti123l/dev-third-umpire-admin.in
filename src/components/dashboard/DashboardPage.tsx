@@ -21,6 +21,9 @@ export default function DashboardPage() {
     web_new_version: "",
     device_update_url: "",
     web_update_url: "",
+    fota_old_version: "",
+    fota_new_version: "",
+    fota_update_url: ""
   });
 
   const { mutateAsync: addFotaForDevice } = useMutation({
@@ -170,6 +173,49 @@ export default function DashboardPage() {
               type="url"
               name="web_update_url"
               value={fotaForm.web_update_url}
+              onChange={handleChange}
+              placeholder="https://releases.example.com/web/v2.4.0"
+              className={inputClass}
+            />
+          </div>
+        </fieldset>
+
+        {/* Fota updater */}
+         <fieldset className="border border-slate-200 rounded-xl p-5 mb-6">
+          <legend className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-1.5">
+            Fota app
+          </legend>
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="flex flex-col gap-1">
+              <label className={labelClass}>Old version</label>
+              <input
+                type="text"
+                name="fota_old_version"
+                value={fotaForm.fota_old_version}
+                onChange={handleChange}
+                placeholder="e.g. v2.3.0"
+                className={inputClass}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className={labelClass}>New version</label>
+              <input
+                type="text"
+                name="fota_new_version"
+                value={fotaForm.fota_new_version}
+                onChange={handleChange}
+                placeholder="e.g. v2.4.0"
+                className={inputClass}
+              />
+            </div>
+          </div>
+          <hr className="border-slate-100 mb-3" />
+          <div className="flex flex-col gap-1">
+            <label className={labelClass}>Update URL</label>
+            <input
+              type="url"
+              name="fota_update_url"
+              value={fotaForm.fota_update_url}
               onChange={handleChange}
               placeholder="https://releases.example.com/web/v2.4.0"
               className={inputClass}

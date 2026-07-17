@@ -6,4 +6,7 @@ export type FotaDetails = {
   web_new_version: string;
   device_update_url: string;
   web_update_url: string;
+  fota_old_version: string,
+  fota_new_version: string,
+  fota_update_url: string
 };
