@@ -7,32 +7,48 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import TanStackTable from "../core/TanstackTable";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { FotaDetails } from "@/types/fotaDetails";
+
+// Text-only fields kept in fotaForm. File uploads (device/web/fota zip) are
+// tracked in separate state below since File objects don't belong in the
+// same object we might otherwise JSON.stringify.
+type FotaTextFields = {
+  device_id: number;
+  device_old_version: string;
+  device_new_version: string;
+  web_old_version: string;
+  web_new_version: string;
+  fota_old_version: string;
+  fota_new_version: string;
+};
 
 export default function DashboardPage() {
   const [devicesList, setDevicesList] = useState([]);
 
-  // const { data }
-  const [fotaForm, setFotaForm] = useState<FotaDetails>({
-    device_id: 11,
+  const [fotaForm, setFotaForm] = useState<FotaTextFields>({
+    device_id: 0,
     device_old_version: "",
     device_new_version: "",
     web_old_version: "",
     web_new_version: "",
-    device_update_url: "",
-    web_update_url: "",
     fota_old_version: "",
     fota_new_version: "",
-    fota_update_url: ""
   });
+
+  // Selected files, only attached to the request when "Submit FOTA update"
+  // is clicked — no automatic upload on file selection.
+  const [deviceZipFile, setDeviceZipFile] = useState<File | null>(null);
+  const [webZipFile, setWebZipFile] = useState<File | null>(null);
+  const [fotaZipFile, setFotaZipFile] = useState<File | null>(null);
 
   const { mutateAsync: addFotaForDevice } = useMutation({
     mutationKey: ["fota-details"],
-    mutationFn: async (payload: FotaDetails) => {
+    mutationFn: async (payload: FormData) => {
+      console.log(payload);
       const result = await AddDetailsIntoFotaDb(payload);
       return result;
     },
   });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFotaForm((prev) => ({
@@ -41,8 +57,52 @@ export default function DashboardPage() {
     }));
   };
 
-  const handleSubmit = () => {
-    addFotaForDevice(fotaForm);
+  const handleFileChange =
+    (setter: (file: File | null) => void) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0] ?? null;
+      console.log(e.target.files)
+
+      if (file && !file.name.toLowerCase().endsWith(".zip")) {
+        toast.error("Please select a .zip file");
+        e.target.value = "";
+        setter(null);
+        return;
+      }
+
+      setter(file);
+    };
+
+  const handleSubmit = async () => {
+    let formData = new FormData();
+
+    console.log(fotaForm);
+    
+    formData.append("device_id", String(fotaForm.device_id));
+    formData.append("device_old_version", fotaForm.device_old_version);
+    formData.append("device_new_version", fotaForm.device_new_version);
+    formData.append("web_old_version", fotaForm.web_old_version);
+    formData.append("web_new_version", fotaForm.web_new_version);
+    formData.append("fota_old_version", fotaForm.fota_old_version);
+    formData.append("fota_new_version", fotaForm.fota_new_version);
+
+    console.log(deviceZipFile);
+
+    if (deviceZipFile) formData.append("device_zip", deviceZipFile);
+    if (webZipFile) formData.append("web_zip", webZipFile);
+    if (fotaZipFile) formData.append("fota_zip", fotaZipFile);
+
+console.log(formData);
+    try {
+      for (const [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
+      await addFotaForDevice(formData);
+      
+      toast.success("FOTA update submitted");
+    } catch (err) {
+      toast.error("Failed to submit FOTA update");
+    }
   };
 
   // const { data, isSuccess, isLoading, isError, error } = useQuery({
@@ -66,6 +126,9 @@ export default function DashboardPage() {
 
   const inputClass =
     "h-9 px-3 text-sm text-slate-900 bg-slate-50 border border-slate-300 rounded-lg outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 placeholder:text-slate-400 w-full";
+
+  const fileInputClass =
+    "h-9 px-3 text-sm text-slate-900 bg-slate-50 border border-slate-300 rounded-lg outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 w-full file:mr-3 file:h-full file:border-0 file:bg-slate-200 file:px-3 file:text-xs file:font-medium file:text-slate-700 cursor-pointer";
 
   const labelClass = "text-xs font-medium text-slate-500";
 
@@ -125,15 +188,18 @@ export default function DashboardPage() {
           </div>
           <hr className="border-slate-100 mb-3" />
           <div className="flex flex-col gap-1">
-            <label className={labelClass}>Update URL</label>
+            <label className={labelClass}>Upload zip</label>
             <input
-              type="url"
-              name="device_update_url"
-              value={fotaForm.device_update_url}
-              onChange={handleChange}
-              placeholder="https://firmware.example.com/v1.1.0.bin"
-              className={inputClass}
+              type="file"
+              accept=".zip"
+              onChange={handleFileChange(setDeviceZipFile)}
+              className={fileInputClass}
             />
+            {deviceZipFile && (
+              <span className="text-xs text-slate-500 mt-1">
+                {deviceZipFile.name}
+              </span>
+            )}
           </div>
         </fieldset>
 
@@ -168,20 +234,23 @@ export default function DashboardPage() {
           </div>
           <hr className="border-slate-100 mb-3" />
           <div className="flex flex-col gap-1">
-            <label className={labelClass}>Update URL</label>
+            <label className={labelClass}>Upload zip</label>
             <input
-              type="url"
-              name="web_update_url"
-              value={fotaForm.web_update_url}
-              onChange={handleChange}
-              placeholder="https://releases.example.com/web/v2.4.0"
-              className={inputClass}
+              type="file"
+              accept=".zip"
+              onChange={handleFileChange(setWebZipFile)}
+              className={fileInputClass}
             />
+            {webZipFile && (
+              <span className="text-xs text-slate-500 mt-1">
+                {webZipFile.name}
+              </span>
+            )}
           </div>
         </fieldset>
 
         {/* Fota updater */}
-         <fieldset className="border border-slate-200 rounded-xl p-5 mb-6">
+        <fieldset className="border border-slate-200 rounded-xl p-5 mb-6">
           <legend className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-1.5">
             Fota app
           </legend>
@@ -211,15 +280,18 @@ export default function DashboardPage() {
           </div>
           <hr className="border-slate-100 mb-3" />
           <div className="flex flex-col gap-1">
-            <label className={labelClass}>Update URL</label>
+            <label className={labelClass}>Upload zip</label>
             <input
-              type="url"
-              name="fota_update_url"
-              value={fotaForm.fota_update_url}
-              onChange={handleChange}
-              placeholder="https://releases.example.com/web/v2.4.0"
-              className={inputClass}
+              type="file"
+              accept=".zip"
+              onChange={handleFileChange(setFotaZipFile)}
+              className={fileInputClass}
             />
+            {fotaZipFile && (
+              <span className="text-xs text-slate-500 mt-1">
+                {fotaZipFile.name}
+              </span>
+            )}
           </div>
         </fieldset>
 

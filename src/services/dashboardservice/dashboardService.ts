@@ -10,9 +10,9 @@ export const getDevicesDetails = async () => {
   }
 };
 
-export const AddDetailsIntoFotaDb = async (payload: FotaDetails) => {
+export const AddDetailsIntoFotaDb = async (payload: FormData) => {
   try {
-    const res = await $fetch.post("/add-fota-details", payload);
+    const res = await $fetch.postFormData("/add-fota-details", payload);
     return res;
   } catch (err) {
     throw err;
