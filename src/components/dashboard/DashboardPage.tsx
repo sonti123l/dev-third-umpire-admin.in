@@ -21,6 +21,9 @@ type FotaTextFields = {
   fota_new_version: string;
 };
 
+// Archive extensions accepted for firmware/web/fota uploads.
+const ALLOWED_ARCHIVE_EXTENSIONS = [".zip", ".7z"];
+
 export default function DashboardPage() {
   const [devicesList, setDevicesList] = useState([]);
 
@@ -63,8 +66,13 @@ export default function DashboardPage() {
       const file = e.target.files?.[0] ?? null;
       console.log(e.target.files)
 
-      if (file && !file.name.toLowerCase().endsWith(".zip")) {
-        toast.error("Please select a .zip file");
+      const fileName = file?.name.toLowerCase() ?? "";
+      const isAllowed = ALLOWED_ARCHIVE_EXTENSIONS.some((ext) =>
+        fileName.endsWith(ext)
+      );
+
+      if (file && !isAllowed) {
+        toast.error("Please select a .zip or .7z file");
         e.target.value = "";
         setter(null);
         return;
@@ -188,10 +196,10 @@ console.log(formData);
           </div>
           <hr className="border-slate-100 mb-3" />
           <div className="flex flex-col gap-1">
-            <label className={labelClass}>Upload zip</label>
+            <label className={labelClass}>Upload archive</label>
             <input
               type="file"
-              accept=".zip"
+              accept=".zip,.7z"
               onChange={handleFileChange(setDeviceZipFile)}
               className={fileInputClass}
             />
@@ -234,10 +242,10 @@ console.log(formData);
           </div>
           <hr className="border-slate-100 mb-3" />
           <div className="flex flex-col gap-1">
-            <label className={labelClass}>Upload zip</label>
+            <label className={labelClass}>Upload archive</label>
             <input
               type="file"
-              accept=".zip"
+              accept=".zip,.7z"
               onChange={handleFileChange(setWebZipFile)}
               className={fileInputClass}
             />
@@ -280,10 +288,10 @@ console.log(formData);
           </div>
           <hr className="border-slate-100 mb-3" />
           <div className="flex flex-col gap-1">
-            <label className={labelClass}>Upload zip</label>
+            <label className={labelClass}>Upload archive</label>
             <input
               type="file"
-              accept=".zip"
+              accept=".zip,.7z"
               onChange={handleFileChange(setFotaZipFile)}
               className={fileInputClass}
             />
