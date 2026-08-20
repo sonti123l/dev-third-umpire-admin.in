@@ -181,7 +181,6 @@ export default function DashboardPage() {
                   onChange={handleChange}
                   placeholder="e.g. v1.0.0"
                   className={inputClass}
-                  required
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -228,7 +227,6 @@ export default function DashboardPage() {
                   onChange={handleChange}
                   placeholder="e.g. v2.3.0"
                   className={inputClass}
-                  required
                 />
               </div>
               <div className="flex flex-col gap-1">
