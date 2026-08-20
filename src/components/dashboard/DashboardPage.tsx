@@ -64,11 +64,11 @@ export default function DashboardPage() {
     (setter: (file: File | null) => void) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0] ?? null;
-      console.log(e.target.files)
+      console.log(e.target.files);
 
       const fileName = file?.name.toLowerCase() ?? "";
       const isAllowed = ALLOWED_ARCHIVE_EXTENSIONS.some((ext) =>
-        fileName.endsWith(ext)
+        fileName.endsWith(ext),
       );
 
       if (file && !isAllowed) {
@@ -84,8 +84,6 @@ export default function DashboardPage() {
   const handleSubmit = async () => {
     let formData = new FormData();
 
-    console.log(fotaForm);
-    
     formData.append("device_id", String(fotaForm.device_id));
     formData.append("device_old_version", fotaForm.device_old_version);
     formData.append("device_new_version", fotaForm.device_new_version);
@@ -94,19 +92,16 @@ export default function DashboardPage() {
     formData.append("fota_old_version", fotaForm.fota_old_version);
     formData.append("fota_new_version", fotaForm.fota_new_version);
 
-    console.log(deviceZipFile);
-
     if (deviceZipFile) formData.append("device_zip", deviceZipFile);
     if (webZipFile) formData.append("web_zip", webZipFile);
     if (fotaZipFile) formData.append("fota_zip", fotaZipFile);
 
-console.log(formData);
     try {
       for (const [key, value] of formData.entries()) {
         console.log(key, value);
       }
       await addFotaForDevice(formData);
-      
+
       toast.success("FOTA update submitted");
     } catch (err) {
       toast.error("Failed to submit FOTA update");
@@ -146,170 +141,179 @@ console.log(formData);
         Dashboard Page
       </h1>
 
-      <div className="max-w-2xl">
-        <h2 className="text-lg font-medium text-slate-900 mb-6">
-          FOTA update details
-        </h2>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+      >
+        <div className="max-w-2xl">
+          <h2 className="text-lg font-medium text-slate-900 mb-6">
+            FOTA update details
+          </h2>
 
-        {/* Device ID */}
-        <div className="mb-5">
-          <div className="flex flex-col gap-1 w-40">
-            <label className={labelClass}>Device ID</label>
-            <input
-              type="text"
-              name="device_id"
-              value={fotaForm.device_id}
-              onChange={handleChange}
-              className={inputClass}
-            />
+          {/* Device ID */}
+          <div className="mb-5">
+            <div className="flex flex-col gap-1 w-40">
+              <label className={labelClass}>Device ID</label>
+              <input
+                type="text"
+                name="device_id"
+                value={fotaForm.device_id}
+                onChange={handleChange}
+                className={inputClass}
+              />
+            </div>
           </div>
+
+          {/* Device Firmware */}
+          <fieldset className="border border-slate-200 rounded-xl p-5 mb-5">
+            <legend className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-1.5">
+              Device firmware
+            </legend>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Old version</label>
+                <input
+                  type="text"
+                  name="device_old_version"
+                  value={fotaForm.device_old_version}
+                  onChange={handleChange}
+                  placeholder="e.g. v1.0.0"
+                  className={inputClass}
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>New version</label>
+                <input
+                  type="text"
+                  name="device_new_version"
+                  value={fotaForm.device_new_version}
+                  onChange={handleChange}
+                  placeholder="e.g. v1.1.0"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+            <hr className="border-slate-100 mb-3" />
+            <div className="flex flex-col gap-1">
+              <label className={labelClass}>Upload archive</label>
+              <input
+                type="file"
+                accept=".zip,.7z"
+                onChange={handleFileChange(setDeviceZipFile)}
+                className={fileInputClass}
+              />
+              {deviceZipFile && (
+                <span className="text-xs text-slate-500 mt-1">
+                  {deviceZipFile.name}
+                </span>
+              )}
+            </div>
+          </fieldset>
+
+          {/* Web App */}
+          <fieldset className="border border-slate-200 rounded-xl p-5 mb-6">
+            <legend className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-1.5">
+              Web app
+            </legend>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Old version</label>
+                <input
+                  type="text"
+                  name="web_old_version"
+                  value={fotaForm.web_old_version}
+                  onChange={handleChange}
+                  placeholder="e.g. v2.3.0"
+                  className={inputClass}
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>New version</label>
+                <input
+                  type="text"
+                  name="web_new_version"
+                  value={fotaForm.web_new_version}
+                  onChange={handleChange}
+                  placeholder="e.g. v2.4.0"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+            <hr className="border-slate-100 mb-3" />
+            <div className="flex flex-col gap-1">
+              <label className={labelClass}>Upload archive</label>
+              <input
+                type="file"
+                accept=".zip,.7z"
+                onChange={handleFileChange(setWebZipFile)}
+                className={fileInputClass}
+              />
+              {webZipFile && (
+                <span className="text-xs text-slate-500 mt-1">
+                  {webZipFile.name}
+                </span>
+              )}
+            </div>
+          </fieldset>
+
+          {/* Fota updater */}
+          <fieldset className="border border-slate-200 rounded-xl p-5 mb-6">
+            <legend className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-1.5">
+              Fota app
+            </legend>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>Old version</label>
+                <input
+                  type="text"
+                  name="fota_old_version"
+                  value={fotaForm.fota_old_version}
+                  onChange={handleChange}
+                  placeholder="e.g. v2.3.0"
+                  className={inputClass}
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className={labelClass}>New version</label>
+                <input
+                  type="text"
+                  name="fota_new_version"
+                  value={fotaForm.fota_new_version}
+                  onChange={handleChange}
+                  placeholder="e.g. v2.4.0"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+            <hr className="border-slate-100 mb-3" />
+            <div className="flex flex-col gap-1">
+              <label className={labelClass}>Upload archive</label>
+              <input
+                type="file"
+                accept=".zip,.7z"
+                onChange={handleFileChange(setFotaZipFile)}
+                className={fileInputClass}
+              />
+              {fotaZipFile && (
+                <span className="text-xs text-slate-500 mt-1">
+                  {fotaZipFile.name}
+                </span>
+              )}
+            </div>
+          </fieldset>
+
+          <button
+            type="submit"
+            className="flex items-center gap-2 bg-slate-900 text-white text-sm font-medium px-5 h-10 rounded-lg hover:bg-slate-700 active:scale-95 transition cursor-pointer"
+          >
+            Submit FOTA update
+          </button>
         </div>
-
-        {/* Device Firmware */}
-        <fieldset className="border border-slate-200 rounded-xl p-5 mb-5">
-          <legend className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-1.5">
-            Device firmware
-          </legend>
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            <div className="flex flex-col gap-1">
-              <label className={labelClass}>Old version</label>
-              <input
-                type="text"
-                name="device_old_version"
-                value={fotaForm.device_old_version}
-                onChange={handleChange}
-                placeholder="e.g. v1.0.0"
-                className={inputClass}
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className={labelClass}>New version</label>
-              <input
-                type="text"
-                name="device_new_version"
-                value={fotaForm.device_new_version}
-                onChange={handleChange}
-                placeholder="e.g. v1.1.0"
-                className={inputClass}
-              />
-            </div>
-          </div>
-          <hr className="border-slate-100 mb-3" />
-          <div className="flex flex-col gap-1">
-            <label className={labelClass}>Upload archive</label>
-            <input
-              type="file"
-              accept=".zip,.7z"
-              onChange={handleFileChange(setDeviceZipFile)}
-              className={fileInputClass}
-            />
-            {deviceZipFile && (
-              <span className="text-xs text-slate-500 mt-1">
-                {deviceZipFile.name}
-              </span>
-            )}
-          </div>
-        </fieldset>
-
-        {/* Web App */}
-        <fieldset className="border border-slate-200 rounded-xl p-5 mb-6">
-          <legend className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-1.5">
-            Web app
-          </legend>
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            <div className="flex flex-col gap-1">
-              <label className={labelClass}>Old version</label>
-              <input
-                type="text"
-                name="web_old_version"
-                value={fotaForm.web_old_version}
-                onChange={handleChange}
-                placeholder="e.g. v2.3.0"
-                className={inputClass}
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className={labelClass}>New version</label>
-              <input
-                type="text"
-                name="web_new_version"
-                value={fotaForm.web_new_version}
-                onChange={handleChange}
-                placeholder="e.g. v2.4.0"
-                className={inputClass}
-              />
-            </div>
-          </div>
-          <hr className="border-slate-100 mb-3" />
-          <div className="flex flex-col gap-1">
-            <label className={labelClass}>Upload archive</label>
-            <input
-              type="file"
-              accept=".zip,.7z"
-              onChange={handleFileChange(setWebZipFile)}
-              className={fileInputClass}
-            />
-            {webZipFile && (
-              <span className="text-xs text-slate-500 mt-1">
-                {webZipFile.name}
-              </span>
-            )}
-          </div>
-        </fieldset>
-
-        {/* Fota updater */}
-        <fieldset className="border border-slate-200 rounded-xl p-5 mb-6">
-          <legend className="text-xs font-semibold text-slate-400 uppercase tracking-widest px-1.5">
-            Fota app
-          </legend>
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            <div className="flex flex-col gap-1">
-              <label className={labelClass}>Old version</label>
-              <input
-                type="text"
-                name="fota_old_version"
-                value={fotaForm.fota_old_version}
-                onChange={handleChange}
-                placeholder="e.g. v2.3.0"
-                className={inputClass}
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className={labelClass}>New version</label>
-              <input
-                type="text"
-                name="fota_new_version"
-                value={fotaForm.fota_new_version}
-                onChange={handleChange}
-                placeholder="e.g. v2.4.0"
-                className={inputClass}
-              />
-            </div>
-          </div>
-          <hr className="border-slate-100 mb-3" />
-          <div className="flex flex-col gap-1">
-            <label className={labelClass}>Upload archive</label>
-            <input
-              type="file"
-              accept=".zip,.7z"
-              onChange={handleFileChange(setFotaZipFile)}
-              className={fileInputClass}
-            />
-            {fotaZipFile && (
-              <span className="text-xs text-slate-500 mt-1">
-                {fotaZipFile.name}
-              </span>
-            )}
-          </div>
-        </fieldset>
-
-        <button
-          onClick={handleSubmit}
-          className="flex items-center gap-2 bg-slate-900 text-white text-sm font-medium px-5 h-10 rounded-lg hover:bg-slate-700 active:scale-95 transition cursor-pointer"
-        >
-          Submit FOTA update
-        </button>
-      </div>
+      </form>
 
       {/* <TanStackTable columns={DeviceColumns()} data={devicesList} /> */}
     </div>
