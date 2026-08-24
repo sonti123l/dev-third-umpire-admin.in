@@ -1,5 +1,5 @@
 import prepareURLEncodedParams from "././prepareURLEncodedParams";
-import Cookies from "js-cookie"
+import Cookies from "js-cookie";
 
 interface IAPIResponse {
   success: boolean;
@@ -11,15 +11,40 @@ interface IAPIResponse {
 class FetchService {
   authStatusCodes: number[] = [401, 403, 404];
   authErrorURLs: string[] = ["/auth/login"];
+
   private activeRequests = new Map<string, AbortController>();
   private _fetchType: string;
   private requestCounter = 0;
+
   constructor(fetchTypeValue = "json") {
     this._fetchType = fetchTypeValue;
   }
 
+  /**
+   * Returns the FOTA server base URL based on the selected server.
+   *
+   * fota_server_id:
+   * 1 -> Production
+   * 2 -> Test
+   */
+  private getBaseUrl(): string {
+    const serverId = localStorage.getItem("fota_server_id");
+
+    if (serverId === "1") {
+      return "https://fota.thirdumpire.ai";
+    }
+
+    if (serverId === "2") {
+      return "https://fotatest.thirdumpire.ai";
+    }
+
+    // Fallback when no valid server is selected
+    return import.meta.env.VITE_PUBLIC_API_URL;
+  }
+
   configureAuthorization(config: { headers: Record<string, string> }) {
     const accessToken = Cookies.get("token") || "";
+
     config.headers["Authorization"] = "Bearer " + accessToken;
   }
 
@@ -29,7 +54,11 @@ class FetchService {
 
   setDefaultHeaders(config: { headers?: Record<string, string>; body?: unknown }) {
     config.headers = config.headers || {};
-    if (!config.headers["Content-Type"] && !(config.body instanceof FormData)) {
+
+    if (
+      !config.headers["Content-Type"] &&
+      !(config.body instanceof FormData)
+    ) {
       config.headers["Content-Type"] = "application/json";
     }
   }
@@ -52,6 +81,7 @@ class FetchService {
     if (allowConcurrent) {
       return `${method}-${path}-${++this.requestCounter}`;
     }
+
     return `${method}-${path}`;
   }
 
@@ -62,72 +92,137 @@ class FetchService {
       window.location.href = "/";
       return null;
     }
+
     try {
       const response = await fetch(
-        import.meta.env.VITE_PUBLIC_API_URL + "/refresh-token",
+        this.getBaseUrl() + "/refresh-token",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refreshToken }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            refreshToken,
+          }),
         }
       );
 
       if (!response.ok) {
         Cookies.remove("token");
         Cookies.remove("refresh_token");
+
         window.location.href = "/";
+
         return null;
       }
 
       const data = await response.json();
+
       Cookies.set("token", data.access_token);
+
       return data.access_token;
     } catch {
       window.location.href = "/";
+
       return null;
     }
   }
 
-  async hit(...args: [string, RequestInit & { allowConcurrent?: boolean }?]): Promise<IAPIResponse> {
+  async hit(
+    ...args: [
+      string,
+      RequestInit & {
+        allowConcurrent?: boolean;
+      }?
+    ]
+  ): Promise<IAPIResponse> {
     const [path, config = {}] = args;
+
     const method = config.method || "GET";
+
     const allowConcurrent =
       config.allowConcurrent ??
-      (method === "POST" || method === "PUT" || method === "PATCH");
-    const requestKey = this.getRequestKey(path, method, allowConcurrent);
+      (method === "POST" ||
+        method === "PUT" ||
+        method === "PATCH");
+
+    const requestKey = this.getRequestKey(
+      path,
+      method,
+      allowConcurrent
+    );
+
+    /**
+     * Cancel previous request with the same method/path
+     * when concurrent requests are not allowed.
+     */
     if (!allowConcurrent) {
-      const existingController = this.activeRequests.get(requestKey);
+      const existingController =
+        this.activeRequests.get(requestKey);
+
       if (existingController) {
         existingController.abort();
       }
     }
-    const abortController = new AbortController();
-    config.signal = abortController.signal;
-    this.activeRequests.set(requestKey, abortController);
 
+    const abortController = new AbortController();
+
+    config.signal = abortController.signal;
+
+    this.activeRequests.set(
+      requestKey,
+      abortController
+    );
+
+    /**
+     * Set default headers.
+     */
     config.headers = config.headers || {};
-    if (!config.headers["Content-Type"] && !(config.body instanceof FormData)) {
+
+    if (
+      !config.headers["Content-Type"] &&
+      !(config.body instanceof FormData)
+    ) {
       config.headers["Content-Type"] = "application/json";
     }
 
+    /**
+     * Add Authorization header for non-auth requests.
+     */
     if (!this.isAuthRequest(path)) {
       this.configureAuthorization(config);
     }
 
-    const url = import.meta.env.VITE_PUBLIC_API_URL + path;
+    /**
+     * Use the selected FOTA server.
+     *
+     * Production:
+     * https://fota.thirdumpire.ai
+     *
+     * Test:
+     * https://fotatest.thirdumpire.ai
+     */
+    const url = this.getBaseUrl() + path;
+
     let response: Response;
 
     try {
       response = await fetch(url, config);
 
+      /**
+       * If access token expired, refresh it and retry once.
+       */
       if (
         !response.ok &&
         response.status === 401 &&
         !this.checkToLogOutOrNot(path)
       ) {
         const newToken = await this.refreshAccessToken();
+
         if (newToken) {
-          config.headers["Authorization"] = "Bearer " + newToken;
+          config.headers["Authorization"] =
+            "Bearer " + newToken;
+
           response = await fetch(url, config);
         }
       }
@@ -136,7 +231,13 @@ class FetchService {
     } catch (error) {
       this.activeRequests.delete(requestKey);
 
-      if (error instanceof Error && error.name === "AbortError") {
+      /**
+       * Request was cancelled.
+       */
+      if (
+        error instanceof Error &&
+        error.name === "AbortError"
+      ) {
         return {
           success: false,
           status: 0,
@@ -144,28 +245,41 @@ class FetchService {
           message: "Request cancelled",
         };
       }
+
       throw {
         success: false,
         status: 0,
         data: null,
-        message: error instanceof Error ? error.message : "Network error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Network error",
       };
     }
 
+    /**
+     * Handle unsuccessful HTTP responses.
+     */
     if (!response.ok) {
       if (
         this.authStatusCodes.includes(response.status) &&
         !this.checkToLogOutOrNot(path)
       ) {
-        const contentType = response.headers.get("Content-Type") || "";
+        const contentType =
+          response.headers.get("Content-Type") || "";
+
         let errorData;
+
         try {
           errorData = contentType.includes("text/html")
             ? await response.text()
             : await response.json();
         } catch {
-          errorData = { message: response.statusText };
+          errorData = {
+            message: response.statusText,
+          };
         }
+
         throw {
           success: false,
           status: response.status,
@@ -173,44 +287,69 @@ class FetchService {
           message: response.statusText,
         };
       }
-      const contentType = response.headers.get("Content-Type") || "";
+
+      const contentType =
+        response.headers.get("Content-Type") || "";
+
       let errorData;
+
       try {
         errorData = contentType.includes("text/html")
           ? await response.text()
           : await response.json();
       } catch {
-        errorData = { message: response.statusText };
+        errorData = {
+          message: response.statusText,
+        };
       }
-      const err = new Error(errorData.message || response.statusText) as Error & { data?: unknown; status?: number };
+
+      const err = new Error(
+        errorData.message || response.statusText
+      ) as Error & {
+        data?: unknown;
+        status?: number;
+      };
+
       err.data = errorData;
       err.status = response.status;
+
       throw err;
     }
 
+    /**
+     * Return raw Response when fetchType is "response".
+     */
     if (this._fetchType === "response") {
-      return response;
-    } else {
-      const contentType = response.headers.get("Content-Type") || "";
-      if (contentType.includes("text/html")) {
-        return {
-          success: true,
-          status: response.status,
-          data: await response.text(),
-        };
-      }
+      return response as unknown as IAPIResponse;
+    }
+
+    /**
+     * Handle response data.
+     */
+    const contentType =
+      response.headers.get("Content-Type") || "";
+
+    if (contentType.includes("text/html")) {
       return {
         success: true,
         status: response.status,
-        data: await response.json(),
+        data: await response.text(),
       };
     }
+
+    return {
+      success: true,
+      status: response.status,
+      data: await response.json(),
+    };
   }
 
   async post(url: string, payload?: unknown) {
     return await this.hit(url, {
       method: "POST",
-      body: payload ? JSON.stringify(payload) : undefined,
+      body: payload
+        ? JSON.stringify(payload)
+        : undefined,
     });
   }
 
@@ -221,18 +360,29 @@ class FetchService {
     });
   }
 
-  async get(url: string, queryParams = {}, contentType?: string) {
+  async get(
+    url: string,
+    queryParams = {},
+    contentType?: string
+  ) {
     if (Object.keys(queryParams).length) {
-      url = prepareURLEncodedParams(url, queryParams);
+      url = prepareURLEncodedParams(
+        url,
+        queryParams
+      );
     }
+
     const config: RequestInit = {
       method: "GET",
     };
+
     this.setDefaultHeaders(config);
+
     if (contentType) {
-      config.headers["Content-Type"] = contentType;
-      config.headers["Accept"] = contentType;
+      config.headers!["Content-Type"] = contentType;
+      config.headers!["Accept"] = contentType;
     }
+
     return this.hit(url, config);
   }
 
@@ -264,7 +414,10 @@ class FetchService {
   }
 
   cancelAll() {
-    this.activeRequests.forEach((controller) => controller.abort());
+    this.activeRequests.forEach((controller) => {
+      controller.abort();
+    });
+
     this.activeRequests.clear();
   }
 }

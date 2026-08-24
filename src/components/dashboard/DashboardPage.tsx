@@ -62,6 +62,7 @@ export default function DashboardPage() {
     fota_new_version: "",
   });
 
+  const [fota_update_server_id, set_fota_update_server_id] = useState(1);
   // Selected files, only attached to the request when "Submit FOTA update"
   // is clicked — no automatic upload on file selection.
   const [deviceZipFile, setDeviceZipFile] = useState<File | null>(null);
@@ -82,6 +83,7 @@ export default function DashboardPage() {
       const result = await getDevicesDetails();
       return result?.data;
     },
+    enabled: !!fota_update_server_id,
     staleTime: 60000,
     refetchOnWindowFocus: true,
   });
@@ -90,9 +92,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (isDevicesError) {
-      toast.error(
-        (devicesError as Error)?.message || "Devices list not found",
-      );
+      toast.error((devicesError as Error)?.message || "Devices list not found");
     }
   }, [isDevicesError, devicesError]);
 
@@ -147,6 +147,13 @@ export default function DashboardPage() {
     }));
   }, [isFotaDetailsError, fotaDetailsErrorObj]);
 
+  // Use it and store the server_id in the localStorage
+  useEffect(() => {
+    if (fota_update_server_id) {
+      localStorage.setItem("fota_server_id", String(fota_update_server_id));
+    }
+  }, [fota_update_server_id]);
+
   const { mutateAsync: addFotaForDevice } = useMutation({
     mutationKey: ["fota-details-submit"],
     mutationFn: async (payload: FormData) => {
@@ -172,6 +179,10 @@ export default function DashboardPage() {
         fota_old_version: "",
       }));
       return;
+    }
+
+    if (name == "server_id") {
+      set_fota_update_server_id(Number(value));
     }
 
     setFotaForm((prev) => ({
@@ -253,9 +264,11 @@ export default function DashboardPage() {
         {/* Device selection — populated from GET /devices-list. Choosing a
             device also triggers GET /:deviceId/get-fota-details to
             pre-fill the old-version fields below. */}
-        <div className="mb-5">
+        <div className="flex items-end gap-5 border mb-5 p-4">
+          {/* Device */}
           <div className="flex flex-col gap-1 w-64">
             <label className={labelClass}>Device</label>
+
             <select
               name="device_id"
               value={fotaForm.device_id}
@@ -270,6 +283,7 @@ export default function DashboardPage() {
                     ? "No devices found"
                     : "Select a device"}
               </option>
+
               {devicesList.map((device) => (
                 <option key={device.id} value={device.id}>
                   {device.name
@@ -277,6 +291,21 @@ export default function DashboardPage() {
                     : `Device #${device.id}`}
                 </option>
               ))}
+            </select>
+          </div>
+
+          {/* Server */}
+          <div className="flex flex-col gap-1 w-64">
+            <label className={labelClass}>Server</label>
+
+            <select
+              name="server_id"
+              value={fota_update_server_id}
+              onChange={handleChange}
+              className={inputClass}
+            >
+              <option value={1}>Production Server</option>
+              <option value={2}>Test Server</option>
             </select>
           </div>
         </div>
