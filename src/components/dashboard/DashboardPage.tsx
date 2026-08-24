@@ -62,7 +62,13 @@ export default function DashboardPage() {
     fota_new_version: "",
   });
 
-  const [fota_update_server_id, set_fota_update_server_id] = useState(1);
+  const [fota_update_server_id, set_fota_update_server_id] = useState<number>(
+    () => {
+      const storedServerId = localStorage.getItem("fota_server_id");
+
+      return storedServerId ? Number(storedServerId) : 1;
+    },
+  );
   // Selected files, only attached to the request when "Submit FOTA update"
   // is clicked — no automatic upload on file selection.
   const [deviceZipFile, setDeviceZipFile] = useState<File | null>(null);
@@ -78,7 +84,7 @@ export default function DashboardPage() {
     isError: isDevicesError,
     error: devicesError,
   } = useQuery({
-    queryKey: ["devices"],
+    queryKey: ["devices", fota_update_server_id],
     queryFn: async () => {
       const result = await getDevicesDetails();
       return result?.data;
@@ -147,13 +153,6 @@ export default function DashboardPage() {
     }));
   }, [isFotaDetailsError, fotaDetailsErrorObj]);
 
-  // Use it and store the server_id in the localStorage
-  useEffect(() => {
-    if (fota_update_server_id) {
-      localStorage.setItem("fota_server_id", String(fota_update_server_id));
-    }
-  }, [fota_update_server_id]);
-
   const { mutateAsync: addFotaForDevice } = useMutation({
     mutationKey: ["fota-details-submit"],
     mutationFn: async (payload: FormData) => {
@@ -167,10 +166,27 @@ export default function DashboardPage() {
   ) => {
     const { name, value } = e.target;
 
+    if (name === "server_id") {
+      const serverId = Number(value);
+
+      set_fota_update_server_id(serverId);
+
+      localStorage.setItem("fota_server_id", String(serverId));
+
+      // Reset selected device because the device list
+      // belongs to the newly selected server.
+      setFotaForm((prev) => ({
+        ...prev,
+        device_id: 0,
+        device_old_version: "",
+        web_old_version: "",
+        fota_old_version: "",
+      }));
+
+      return;
+    }
+
     if (name === "device_id") {
-      // Switching devices: reset old-version fields immediately so stale
-      // values from the previously selected device don't linger while
-      // the new device's fota-details query is in flight.
       setFotaForm((prev) => ({
         ...prev,
         device_id: Number(value),
@@ -178,11 +194,8 @@ export default function DashboardPage() {
         web_old_version: "",
         fota_old_version: "",
       }));
-      return;
-    }
 
-    if (name == "server_id") {
-      set_fota_update_server_id(Number(value));
+      return;
     }
 
     setFotaForm((prev) => ({
@@ -274,7 +287,11 @@ export default function DashboardPage() {
               value={fotaForm.device_id}
               onChange={handleChange}
               className={inputClass}
-              disabled={isDevicesLoading || devicesList.length === 0}
+              disabled={
+                !fota_update_server_id ||
+                isDevicesLoading ||
+                devicesList.length === 0
+              }
             >
               <option value={0} disabled>
                 {isDevicesLoading
