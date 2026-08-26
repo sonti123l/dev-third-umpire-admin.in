@@ -50,80 +50,210 @@ const ALLOWED_ARCHIVE_EXTENSIONS = [".zip", ".7z"];
 /* ─────────────────────────── Icons ─────────────────────────── */
 
 const IconServer = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"
+    />
   </svg>
 );
 
 const IconChip = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+    />
   </svg>
 );
 
 const IconGlobe = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+    />
   </svg>
 );
 
 const IconRefresh = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+    />
   </svg>
 );
 
 const IconUpload = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+    />
   </svg>
 );
 
 const IconArrow = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M13 7l5 5m0 0l-5 5m5-5H6"
+    />
   </svg>
 );
 
 const IconX = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M6 18L18 6M6 6l12 12"
+    />
   </svg>
 );
 
 const IconCheck = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M5 13l4 4L19 7"
+    />
   </svg>
 );
 
 const IconChevron = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M19 9l-7 7-7-7"
+    />
   </svg>
 );
 
 const IconActivity = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M13 10V3L4 14h7v7l9-11h-7z"
+    />
   </svg>
 );
 
 const IconHardDrive = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"
+    />
   </svg>
 );
 
 const IconClock = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+    />
   </svg>
 );
 
 const IconSignal = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
+    />
   </svg>
 );
 
@@ -140,7 +270,12 @@ function formatBytes(bytes: number): string {
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return "—";
   const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 /* ─────────────────────────── Sub-Components ─────────────────────────── */
@@ -148,12 +283,16 @@ function formatDate(dateStr: string | null): string {
 function StatusBadge({ status }: { status: string | null }) {
   const isOnline = status?.toLowerCase() === "online";
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
-      isOnline
-        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-        : "bg-amber-50 text-amber-700 border-amber-200"
-    }`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-500" : "bg-amber-500"}`} />
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+        isOnline
+          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+          : "bg-amber-50 text-amber-700 border-amber-200"
+      }`}
+    >
+      <span
+        className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-500" : "bg-amber-500"}`}
+      />
       {status || "Unknown"}
     </span>
   );
@@ -196,7 +335,9 @@ function FileUploadZone({
     // Simulate change event
     const dt = new DataTransfer();
     dt.items.add(dropped);
-    const synthetic = { target: { files: dt.files } } as React.ChangeEvent<HTMLInputElement>;
+    const synthetic = {
+      target: { files: dt.files },
+    } as React.ChangeEvent<HTMLInputElement>;
     onFileChange(synthetic);
   };
 
@@ -208,12 +349,18 @@ function FileUploadZone({
             <IconUpload className="w-4 h-4 text-indigo-600" />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-medium text-slate-900 truncate">{file.name}</p>
+            <p className="text-sm font-medium text-slate-900 truncate">
+              {file.name}
+            </p>
             <p className="text-xs text-slate-500">{formatBytes(file.size)}</p>
           </div>
         </div>
         <button
-          onClick={() => onFileChange({ target: { files: null } } as React.ChangeEvent<HTMLInputElement>)}
+          onClick={() =>
+            onFileChange({
+              target: { files: null },
+            } as React.ChangeEvent<HTMLInputElement>)
+          }
           className="p-1.5 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-600"
         >
           <IconX />
@@ -231,19 +378,26 @@ function FileUploadZone({
         disabled
           ? "bg-slate-50 border-slate-200 opacity-50 cursor-not-allowed"
           : dragActive
-          ? "bg-indigo-50 border-indigo-400"
-          : "bg-slate-50/50 border-slate-300 hover:border-slate-400 hover:bg-slate-50"
+            ? "bg-indigo-50 border-indigo-400"
+            : "bg-slate-50/50 border-slate-300 hover:border-slate-400 hover:bg-slate-50"
       }`}
     >
       <div className="flex flex-col items-center gap-2">
-        <div className={`p-2 rounded-lg transition-colors ${dragActive ? "bg-indigo-100" : "bg-slate-100"}`}>
-          <IconUpload className={`w-5 h-5 ${dragActive ? "text-indigo-600" : "text-slate-400"}`} />
+        <div
+          className={`p-2 rounded-lg transition-colors ${dragActive ? "bg-indigo-100" : "bg-slate-100"}`}
+        >
+          <IconUpload
+            className={`w-5 h-5 ${dragActive ? "text-indigo-600" : "text-slate-400"}`}
+          />
         </div>
         <div className="text-center">
           <p className="text-xs font-medium text-slate-700">
-            <span className="text-indigo-600">Click to upload</span> or drag and drop
+            <span className="text-indigo-600">Click to upload</span> or drag and
+            drop
           </p>
-          <p className="text-[10px] text-slate-400 mt-0.5">.zip or .7z up to any size</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">
+            .zip or .7z up to any size
+          </p>
         </div>
       </div>
       <input
@@ -270,10 +424,12 @@ export default function DashboardPage() {
     fota_new_version: "",
   });
 
-  const [fota_update_server_id, set_fota_update_server_id] = useState<number>(() => {
-    const stored = localStorage.getItem("fota_server_id");
-    return stored ? Number(stored) : 1;
-  });
+  const [fota_update_server_id, set_fota_update_server_id] = useState<number>(
+    () => {
+      const stored = localStorage.getItem("fota_server_id");
+      return stored ? Number(stored) : 1;
+    },
+  );
 
   const [deviceZipFile, setDeviceZipFile] = useState<File | null>(null);
   const [webZipFile, setWebZipFile] = useState<File | null>(null);
@@ -325,7 +481,8 @@ export default function DashboardPage() {
     const latest: FotaDetailsRow = fotaDetailsData.fotaDetails;
     setFotaForm((prev) => ({
       ...prev,
-      device_old_version: latest.deviceNewVersion ?? latest.deviceOldVersion ?? "",
+      device_old_version:
+        latest.deviceNewVersion ?? latest.deviceOldVersion ?? "",
       web_old_version: latest.webNewVersion ?? latest.webOldVersion ?? "",
       fota_old_version: latest.fotaNewVersion ?? latest.fotaOldVersion ?? "",
     }));
@@ -352,11 +509,13 @@ export default function DashboardPage() {
   /* ── Derived ── */
   const selectedDevice = useMemo(
     () => devicesList.find((d) => d.id === fotaForm.device_id) ?? null,
-    [devicesList, fotaForm.device_id]
+    [devicesList, fotaForm.device_id],
   );
 
   const hasAnyNewVersion = Boolean(
-    fotaForm.device_new_version || fotaForm.web_new_version || fotaForm.fota_new_version
+    fotaForm.device_new_version ||
+    fotaForm.web_new_version ||
+    fotaForm.fota_new_version,
   );
   const hasAnyFile = Boolean(deviceZipFile || webZipFile || fotaZipFile);
   const canSubmit = fotaForm.device_id > 0 && (hasAnyNewVersion || hasAnyFile);
@@ -376,6 +535,10 @@ export default function DashboardPage() {
     setWebZipFile(null);
     setFotaZipFile(null);
   };
+
+  useEffect(() => {
+    localStorage.setItem("fota_server_id", String(fota_update_server_id));
+  }, [fota_update_server_id]);
 
   const handleDeviceChange = (deviceId: number) => {
     setFotaForm((prev) => ({
@@ -402,7 +565,9 @@ export default function DashboardPage() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0] ?? null;
       const fileName = file?.name.toLowerCase() ?? "";
-      const isAllowed = ALLOWED_ARCHIVE_EXTENSIONS.some((ext) => fileName.endsWith(ext));
+      const isAllowed = ALLOWED_ARCHIVE_EXTENSIONS.some((ext) =>
+        fileName.endsWith(ext),
+      );
       if (file && !isAllowed) {
         toast.error("Please select a .zip or .7z file");
         e.target.value = "";
@@ -464,13 +629,19 @@ export default function DashboardPage() {
               <IconActivity className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-slate-900 leading-tight tracking-tight">FOTA Manager</h1>
-              <p className="text-[11px] text-slate-500 font-medium">Firmware Over-The-Air Deployment</p>
+              <h1 className="text-base font-bold text-slate-900 leading-tight tracking-tight">
+                FOTA Manager
+              </h1>
+              <p className="text-[11px] text-slate-500 font-medium">
+                Firmware Over-The-Air Deployment
+              </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs font-medium text-slate-500 hidden sm:inline">Environment</span>
+            <span className="text-xs font-medium text-slate-500 hidden sm:inline">
+              Environment
+            </span>
             <div className="flex bg-slate-100 p-1 rounded-xl">
               <button
                 onClick={() => handleServerChange(1)}
@@ -503,8 +674,13 @@ export default function DashboardPage() {
           <div className="p-6 pb-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Target Device</h2>
-                <p className="text-sm text-slate-500 mt-0.5">Select a device to inspect current versions and prepare deployment</p>
+                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+                  Target Device
+                </h2>
+                <p className="text-sm text-slate-500 mt-0.5">
+                  Select a device to inspect current versions and prepare
+                  deployment
+                </p>
               </div>
               {selectedDevice && <StatusBadge status={selectedDevice.status} />}
             </div>
@@ -512,7 +688,9 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Device Selector */}
               <div className="lg:col-span-4">
-                <label className="block text-xs font-semibold text-slate-700 mb-2">Select Device</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-2">
+                  Select Device
+                </label>
                 <div className="relative">
                   <select
                     value={fotaForm.device_id}
@@ -524,12 +702,14 @@ export default function DashboardPage() {
                       {isDevicesLoading
                         ? "Loading devices..."
                         : devicesList.length === 0
-                        ? "No devices available"
-                        : "Choose a device..."}
+                          ? "No devices available"
+                          : "Choose a device..."}
                     </option>
                     {devicesList.map((device) => (
                       <option key={device.id} value={device.id}>
-                        {device.name ? `${device.name}  ·  #${device.id}` : `Device #${device.id}`}
+                        {device.name
+                          ? `${device.name}  ·  #${device.id}`
+                          : `Device #${device.id}`}
                       </option>
                     ))}
                   </select>
@@ -546,25 +726,38 @@ export default function DashboardPage() {
                     <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
                       <div className="flex items-center gap-2 mb-1.5">
                         <IconHardDrive className="w-3.5 h-3.5 text-slate-400" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hardware UUID</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          Hardware UUID
+                        </span>
                       </div>
-                      <p className="text-sm font-mono font-medium text-slate-700 truncate" title={selectedDevice.hardwareUuid}>
+                      <p
+                        className="text-sm font-mono font-medium text-slate-700 truncate"
+                        title={selectedDevice.hardwareUuid}
+                      >
                         {selectedDevice.hardwareUuid}
                       </p>
                     </div>
                     <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
                       <div className="flex items-center gap-2 mb-1.5">
                         <IconClock className="w-3.5 h-3.5 text-slate-400" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Last Heartbeat</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          Last Heartbeat
+                        </span>
                       </div>
-                      <p className="text-sm font-medium text-slate-700">{formatDate(selectedDevice.lastHeartbeat)}</p>
+                      <p className="text-sm font-medium text-slate-700">
+                        {formatDate(selectedDevice.lastHeartbeat)}
+                      </p>
                     </div>
                     <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
                       <div className="flex items-center gap-2 mb-1.5">
                         <IconSignal className="w-3.5 h-3.5 text-slate-400" />
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Current Firmware</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          Current Firmware
+                        </span>
                       </div>
-                      <p className="text-sm font-medium text-slate-700">{selectedDevice.firmwareVersion || "Unknown"}</p>
+                      <p className="text-sm font-medium text-slate-700">
+                        {selectedDevice.firmwareVersion || "Unknown"}
+                      </p>
                     </div>
                   </div>
                 ) : (
@@ -572,7 +765,9 @@ export default function DashboardPage() {
                     <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center mb-2">
                       <IconChip className="w-4 h-4 text-slate-300" />
                     </div>
-                    <p className="text-xs text-slate-400 font-medium">Select a device to view telemetry</p>
+                    <p className="text-xs text-slate-400 font-medium">
+                      Select a device to view telemetry
+                    </p>
                   </div>
                 )}
               </div>
@@ -583,25 +778,33 @@ export default function DashboardPage() {
           {selectedDevice && (
             <div className="bg-slate-50/80 border-t border-slate-100 px-6 py-3 flex flex-wrap items-center gap-6">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Device</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Device
+                </span>
                 <span className="text-xs font-mono font-semibold text-slate-700 bg-white px-2 py-0.5 rounded-md border border-slate-200">
                   {fotaForm.device_old_version || "—"}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Web</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Web
+                </span>
                 <span className="text-xs font-mono font-semibold text-slate-700 bg-white px-2 py-0.5 rounded-md border border-slate-200">
                   {fotaForm.web_old_version || "—"}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">FOTA</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  FOTA
+                </span>
                 <span className="text-xs font-mono font-semibold text-slate-700 bg-white px-2 py-0.5 rounded-md border border-slate-200">
                   {fotaForm.fota_old_version || "—"}
                 </span>
               </div>
               {isFotaDetailsFetching && (
-                <span className="text-xs text-indigo-600 font-medium animate-pulse ml-auto">Fetching latest versions...</span>
+                <span className="text-xs text-indigo-600 font-medium animate-pulse ml-auto">
+                  Fetching latest versions...
+                </span>
               )}
             </div>
           )}
@@ -618,8 +821,12 @@ export default function DashboardPage() {
                   <IconChip className="w-5 h-5 text-indigo-600" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">Device Firmware</h3>
-                  <p className="text-[11px] text-slate-500">Core system package</p>
+                  <h3 className="text-sm font-bold text-slate-900">
+                    Device Firmware
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Core system package
+                  </p>
                 </div>
               </div>
 
@@ -627,24 +834,37 @@ export default function DashboardPage() {
                 {/* Version Flow */}
                 <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Current</label>
-                    <div className={`h-10 px-3 flex items-center rounded-lg border text-sm font-mono font-medium ${
-                      isFotaDetailsFetching
-                        ? "bg-indigo-50/50 border-indigo-100 text-indigo-400 animate-pulse"
-                        : "bg-slate-50 border-slate-200 text-slate-600"
-                    }`}>
-                      {isFotaDetailsFetching ? "Loading..." : fotaForm.device_old_version || "—"}
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                      Current
+                    </label>
+                    <div
+                      className={`h-10 px-3 flex items-center rounded-lg border text-sm font-mono font-medium ${
+                        isFotaDetailsFetching
+                          ? "bg-indigo-50/50 border-indigo-100 text-indigo-400 animate-pulse"
+                          : "bg-slate-50 border-slate-200 text-slate-600"
+                      }`}
+                    >
+                      {isFotaDetailsFetching
+                        ? "Loading..."
+                        : fotaForm.device_old_version || "—"}
                     </div>
                   </div>
                   <div className="pb-2.5 text-slate-300">
                     <IconArrow className="w-4 h-4" />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">New</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                      New
+                    </label>
                     <input
                       type="text"
                       value={fotaForm.device_new_version}
-                      onChange={(e) => handleVersionChange("device_new_version", e.target.value)}
+                      onChange={(e) =>
+                        handleVersionChange(
+                          "device_new_version",
+                          e.target.value,
+                        )
+                      }
                       disabled={!fotaForm.device_id}
                       placeholder="v1.2.0"
                       className="h-10 px-3 w-full bg-white border border-slate-200 rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
@@ -653,14 +873,18 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Package Archive</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    Package Archive
+                  </label>
                   <FileUploadZone
                     file={deviceZipFile}
                     onFileChange={handleFileChange(setDeviceZipFile)}
                     disabled={!fotaForm.device_id}
                     label="device"
                     dragActive={dragActiveZone === "device"}
-                    onDrag={(active) => setDragActiveZone(active ? "device" : null)}
+                    onDrag={(active) =>
+                      setDragActiveZone(active ? "device" : null)
+                    }
                   />
                 </div>
               </div>
@@ -676,7 +900,9 @@ export default function DashboardPage() {
                   <IconGlobe className="w-5 h-5 text-sky-600" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">Web Application</h3>
+                  <h3 className="text-sm font-bold text-slate-900">
+                    Web Application
+                  </h3>
                   <p className="text-[11px] text-slate-500">Frontend bundle</p>
                 </div>
               </div>
@@ -684,24 +910,34 @@ export default function DashboardPage() {
               <div className="space-y-4 flex-1">
                 <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Current</label>
-                    <div className={`h-10 px-3 flex items-center rounded-lg border text-sm font-mono font-medium ${
-                      isFotaDetailsFetching
-                        ? "bg-sky-50/50 border-sky-100 text-sky-400 animate-pulse"
-                        : "bg-slate-50 border-slate-200 text-slate-600"
-                    }`}>
-                      {isFotaDetailsFetching ? "Loading..." : fotaForm.web_old_version || "—"}
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                      Current
+                    </label>
+                    <div
+                      className={`h-10 px-3 flex items-center rounded-lg border text-sm font-mono font-medium ${
+                        isFotaDetailsFetching
+                          ? "bg-sky-50/50 border-sky-100 text-sky-400 animate-pulse"
+                          : "bg-slate-50 border-slate-200 text-slate-600"
+                      }`}
+                    >
+                      {isFotaDetailsFetching
+                        ? "Loading..."
+                        : fotaForm.web_old_version || "—"}
                     </div>
                   </div>
                   <div className="pb-2.5 text-slate-300">
                     <IconArrow className="w-4 h-4" />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">New</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                      New
+                    </label>
                     <input
                       type="text"
                       value={fotaForm.web_new_version}
-                      onChange={(e) => handleVersionChange("web_new_version", e.target.value)}
+                      onChange={(e) =>
+                        handleVersionChange("web_new_version", e.target.value)
+                      }
                       disabled={!fotaForm.device_id}
                       placeholder="v2.0.0"
                       className="h-10 px-3 w-full bg-white border border-slate-200 rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
@@ -710,14 +946,18 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Package Archive</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    Package Archive
+                  </label>
                   <FileUploadZone
                     file={webZipFile}
                     onFileChange={handleFileChange(setWebZipFile)}
                     disabled={!fotaForm.device_id}
                     label="web"
                     dragActive={dragActiveZone === "web"}
-                    onDrag={(active) => setDragActiveZone(active ? "web" : null)}
+                    onDrag={(active) =>
+                      setDragActiveZone(active ? "web" : null)
+                    }
                   />
                 </div>
               </div>
@@ -733,32 +973,46 @@ export default function DashboardPage() {
                   <IconRefresh className="w-5 h-5 text-violet-600" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">FOTA Updater</h3>
-                  <p className="text-[11px] text-slate-500">Updater agent package</p>
+                  <h3 className="text-sm font-bold text-slate-900">
+                    FOTA Updater
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Updater agent package
+                  </p>
                 </div>
               </div>
 
               <div className="space-y-4 flex-1">
                 <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Current</label>
-                    <div className={`h-10 px-3 flex items-center rounded-lg border text-sm font-mono font-medium ${
-                      isFotaDetailsFetching
-                        ? "bg-violet-50/50 border-violet-100 text-violet-400 animate-pulse"
-                        : "bg-slate-50 border-slate-200 text-slate-600"
-                    }`}>
-                      {isFotaDetailsFetching ? "Loading..." : fotaForm.fota_old_version || "—"}
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                      Current
+                    </label>
+                    <div
+                      className={`h-10 px-3 flex items-center rounded-lg border text-sm font-mono font-medium ${
+                        isFotaDetailsFetching
+                          ? "bg-violet-50/50 border-violet-100 text-violet-400 animate-pulse"
+                          : "bg-slate-50 border-slate-200 text-slate-600"
+                      }`}
+                    >
+                      {isFotaDetailsFetching
+                        ? "Loading..."
+                        : fotaForm.fota_old_version || "—"}
                     </div>
                   </div>
                   <div className="pb-2.5 text-slate-300">
                     <IconArrow className="w-4 h-4" />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">New</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                      New
+                    </label>
                     <input
                       type="text"
                       value={fotaForm.fota_new_version}
-                      onChange={(e) => handleVersionChange("fota_new_version", e.target.value)}
+                      onChange={(e) =>
+                        handleVersionChange("fota_new_version", e.target.value)
+                      }
                       disabled={!fotaForm.device_id}
                       placeholder="v1.0.0"
                       className="h-10 px-3 w-full bg-white border border-slate-200 rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
@@ -767,14 +1021,18 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Package Archive</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    Package Archive
+                  </label>
                   <FileUploadZone
                     file={fotaZipFile}
                     onFileChange={handleFileChange(setFotaZipFile)}
                     disabled={!fotaForm.device_id}
                     label="fota"
                     dragActive={dragActiveZone === "fota"}
-                    onDrag={(active) => setDragActiveZone(active ? "fota" : null)}
+                    onDrag={(active) =>
+                      setDragActiveZone(active ? "fota" : null)
+                    }
                   />
                 </div>
               </div>
@@ -786,13 +1044,19 @@ export default function DashboardPage() {
         <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex items-start gap-4">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                canSubmit ? "bg-indigo-50" : "bg-slate-100"
-              }`}>
-                <IconServer className={`w-5 h-5 ${canSubmit ? "text-indigo-600" : "text-slate-400"}`} />
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                  canSubmit ? "bg-indigo-50" : "bg-slate-100"
+                }`}
+              >
+                <IconServer
+                  className={`w-5 h-5 ${canSubmit ? "text-indigo-600" : "text-slate-400"}`}
+                />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900">Deployment Summary</h3>
+                <h3 className="text-sm font-bold text-slate-900">
+                  Deployment Summary
+                </h3>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5">
                   <div className="flex items-center gap-1.5">
                     {fotaForm.device_id ? (
@@ -800,7 +1064,9 @@ export default function DashboardPage() {
                     ) : (
                       <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-300" />
                     )}
-                    <span className={`text-xs font-medium ${fotaForm.device_id ? "text-slate-700" : "text-slate-400"}`}>
+                    <span
+                      className={`text-xs font-medium ${fotaForm.device_id ? "text-slate-700" : "text-slate-400"}`}
+                    >
                       Device selected
                     </span>
                   </div>
@@ -810,7 +1076,9 @@ export default function DashboardPage() {
                     ) : (
                       <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-300" />
                     )}
-                    <span className={`text-xs font-medium ${hasAnyNewVersion ? "text-slate-700" : "text-slate-400"}`}>
+                    <span
+                      className={`text-xs font-medium ${hasAnyNewVersion ? "text-slate-700" : "text-slate-400"}`}
+                    >
                       Version defined
                     </span>
                   </div>
@@ -820,7 +1088,9 @@ export default function DashboardPage() {
                     ) : (
                       <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-300" />
                     )}
-                    <span className={`text-xs font-medium ${hasAnyFile ? "text-slate-700" : "text-slate-400"}`}>
+                    <span
+                      className={`text-xs font-medium ${hasAnyFile ? "text-slate-700" : "text-slate-400"}`}
+                    >
                       File attached
                     </span>
                   </div>
