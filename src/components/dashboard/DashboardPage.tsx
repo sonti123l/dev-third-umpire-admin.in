@@ -756,7 +756,7 @@ export default function DashboardPage() {
                         </span>
                       </div>
                       <p className="text-sm font-medium text-slate-700">
-                        {selectedDevice.firmwareVersion || "Unknown"}
+                        {selectedDevice.firmwareVersion || fotaForm.device_old_version || "UNKNOWN"}
                       </p>
                     </div>
                   </div>
