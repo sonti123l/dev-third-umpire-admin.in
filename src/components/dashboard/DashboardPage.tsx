@@ -269,12 +269,16 @@ function formatBytes(bytes: number): string {
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return "—";
+
   const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", {
+
+  return d.toLocaleDateString("en-IN", {
+    timeZone: "Asia/Kolkata",
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    hour12: true,
   });
 }
 
