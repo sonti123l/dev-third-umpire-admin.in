@@ -270,9 +270,10 @@ function formatBytes(bytes: number): string {
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return "—";
 
-  const d = new Date(dateStr);
+  // Tell JavaScript the input is UTC
+  const d = new Date(dateStr.endsWith("Z") ? dateStr : dateStr + "Z");
 
-  return d.toLocaleDateString("en-IN", {
+  return d.toLocaleString("en-IN", {
     timeZone: "Asia/Kolkata",
     month: "short",
     day: "numeric",
@@ -281,7 +282,6 @@ function formatDate(dateStr: string | null): string {
     hour12: true,
   });
 }
-
 /* ─────────────────────────── Sub-Components ─────────────────────────── */
 
 function StatusBadge({ status }: { status: string | null }) {
@@ -760,7 +760,9 @@ export default function DashboardPage() {
                         </span>
                       </div>
                       <p className="text-sm font-medium text-slate-700">
-                        {selectedDevice.firmwareVersion || fotaForm.device_old_version || "UNKNOWN"}
+                        {selectedDevice.firmwareVersion ||
+                          fotaForm.device_old_version ||
+                          "UNKNOWN"}
                       </p>
                     </div>
                   </div>
