@@ -11,7 +11,7 @@ export const getDevicesDetails = async () => {
 };
 
 
-export const getFotaDetailsForDevice = async (device_id: number) => {
+export const getFotaDetailsForDevice = async (device_id: string) => {
   try {
     const result = await $fetch.get(`/${device_id}/get-fota-details`);
     return result;
@@ -32,7 +32,7 @@ export const AddDetailsIntoFotaDb = async (payload: FormData) => {
 };
 
 export const getFotaList = async (
-  device_id: number,
+  device_id: string,
   params?: { page?: number; page_size?: number },
 ) => {
   try {

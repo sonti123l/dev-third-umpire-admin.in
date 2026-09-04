@@ -456,6 +456,7 @@
 
     const [dragActiveZone, setDragActiveZone] = useState<string | null>(null);
 
+
     /* ── Queries ── */
     const {
       data: devicesData,
@@ -481,6 +482,11 @@
       }
     }, [isDevicesError, devicesError]);
 
+    const handleGetDeviceHardWareUUid = (id: number) => {
+      const getSelectedDevice = devicesList.filter((eachDevice: any) => eachDevice.id === id );
+      return getSelectedDevice[0]?.hardwareUuid;
+    }
+
     // Latest record only — used to populate the "current" version fields.
     const {
       data: fotaDetailsData,
@@ -489,7 +495,7 @@
     } = useQuery({
       queryKey: ["fota-latest", fotaForm.device_id],
       queryFn: async () => {
-        const result = await getFotaDetailsForDevice(fotaForm.device_id);
+        const result = await getFotaDetailsForDevice(handleGetDeviceHardWareUUid(fotaForm.device_id));
         return result?.data;
       },
       enabled: fotaForm.device_id > 0,
@@ -526,7 +532,7 @@
     } = useQuery({
       queryKey: ["fota-list", fotaForm.device_id, fotaPage, fotaPageSize],
       queryFn: async () => {
-        const result = await getFotaList(fotaForm.device_id, {
+        const result = await getFotaList(handleGetDeviceHardWareUUid(fotaForm.device_id), {
           page: fotaPage,
           page_size: fotaPageSize,
         });
@@ -538,7 +544,7 @@
     });
 
     const fotaHistory: FotaDetailsRow[] = fotaListDetails?.fotaDetails ?? [];
-    const fotaPagination = fotaListDetails?.paginationDetails;
+    const fotaPagination = fotaListDetails?.paginationDetails ?? {};
 
     const handleFotaTableDataChange = useCallback((params: any) => {
       const nextPage = Number(params?.page);
