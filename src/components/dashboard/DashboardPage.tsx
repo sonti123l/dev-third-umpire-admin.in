@@ -526,7 +526,8 @@ export default function DashboardPage() {
       const result = await getFotaList(fotaForm.device_id);
       return result?.data;
     },
-    enabled: fotaForm.device_id > 0,
+    enabled: !!fotaForm.device_id,
+    staleTime: 30000,
     retry: false,
   });
 
