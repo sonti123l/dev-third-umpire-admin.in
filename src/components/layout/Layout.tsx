@@ -6,13 +6,13 @@ export default function Layout() {
   return (
     <div>
       {/* header section */}
-      <div>
+      {/* <div>
         <Button onClick={() => navigate({ to: "/dashboard" })}>
           Dashboard
         </Button>
         <Button onClick={() => navigate({ to: "/updates" })}>Updates</Button>
         <Button onClick={() => navigate({ to: "/settings" })}>Settings</Button>
-      </div>
+      </div> */}
     </div>
   );
 }

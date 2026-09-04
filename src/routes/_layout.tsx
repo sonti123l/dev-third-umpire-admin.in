@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_layout")({
 function RouteComponent() {
   return (
     <div>
-      {/* <Layout /> */}
+      <Layout />
       <Outlet />
     </div>
   );
