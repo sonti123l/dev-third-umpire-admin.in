@@ -30,3 +30,12 @@ export const AddDetailsIntoFotaDb = async (payload: FormData) => {
     throw err;
   }
 };
+
+export const getFotaList = async (device_id: number) => {
+  try {
+    const result = await $fetch.get(`/${device_id}/fota-details-list`);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};

@@ -1,8 +1,9 @@
-import DeviceColumns from "@/helpers/DeviceColumns";
+import FotaHistoryColumns from "@/helpers/FotaHistoryColumns";
 import {
   AddDetailsIntoFotaDb,
   getDevicesDetails,
   getFotaDetailsForDevice,
+  getFotaList,
 } from "@/services/dashboardservice/dashboardService";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import TanStackTable from "../core/TanstackTable";
@@ -34,12 +35,21 @@ type DeviceListItem = {
 };
 
 type FotaDetailsRow = {
-  deviceOldVersion: string | null;
-  deviceNewVersion: string | null;
-  webOldVersion: string | null;
-  webNewVersion: string | null;
-  fotaOldVersion: string | null;
-  fotaNewVersion: string | null;
+  id: number;
+  deviceId: number;
+  deviceOldVersion: string;
+  deviceNewVersion: string;
+  webOldVersion: string;
+  webNewVersion: string;
+  deviceStatus: number;
+  webStatus: number;
+  deviceFotaUrl: string;
+  webFotaUrl: string;
+  fotaOldVersion: string;
+  fotaNewVersion: string;
+  fotaUpdateUrl: string;
+  fotaStatus: string;
+  createdAt: string | null;
   [key: string]: unknown;
 };
 
@@ -418,6 +428,8 @@ function FileUploadZone({
 /* ─────────────────────────── Main Component ─────────────────────────── */
 
 export default function DashboardPage() {
+  const fotaHistoryColumns = FotaHistoryColumns();
+
   const [fotaForm, setFotaForm] = useState<FotaTextFields>({
     device_id: 0,
     device_old_version: "",
@@ -466,12 +478,13 @@ export default function DashboardPage() {
     }
   }, [isDevicesError, devicesError]);
 
+  // Latest record only — used to populate the "current" version fields.
   const {
     data: fotaDetailsData,
     isFetching: isFotaDetailsFetching,
     isError: isFotaDetailsError,
   } = useQuery({
-    queryKey: ["fota-details", fotaForm.device_id],
+    queryKey: ["fota-latest", fotaForm.device_id],
     queryFn: async () => {
       const result = await getFotaDetailsForDevice(fotaForm.device_id);
       return result?.data;
@@ -481,8 +494,8 @@ export default function DashboardPage() {
   });
 
   useEffect(() => {
-    if (!fotaDetailsData?.fotaDetails) return;
-    const latest: FotaDetailsRow = fotaDetailsData.fotaDetails;
+    const latest = fotaDetailsData?.fotaDetails;
+    if (!latest) return;
     setFotaForm((prev) => ({
       ...prev,
       device_old_version:
@@ -501,6 +514,29 @@ export default function DashboardPage() {
       fota_old_version: "",
     }));
   }, [isFotaDetailsError]);
+
+  // Full history — used to feed the update history table.
+  const {
+    data: fotaListDetails,
+    isFetching: isFotaDetailsListFetching,
+    isError: isFotaListError,
+  } = useQuery({
+    queryKey: ["fota-list", fotaForm.device_id],
+    queryFn: async () => {
+      const result = await getFotaList(fotaForm.device_id);
+      return result?.data;
+    },
+    enabled: fotaForm.device_id > 0,
+    retry: false,
+  });
+
+  const fotaHistory: FotaDetailsRow[] = fotaListDetails?.fotaDetails ?? [];
+
+  useEffect(() => {
+    if (isFotaListError) {
+      toast.error("Failed to load update history");
+    }
+  }, [isFotaListError]);
 
   const { mutateAsync: addFotaForDevice } = useMutation({
     mutationKey: ["fota-details-submit"],
@@ -1045,6 +1081,28 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Update History Table */}
+        {selectedDevice && (
+          <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="p-5 pb-0">
+              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+                Update History
+              </h2>
+              <p className="text-sm text-slate-500 mt-0.5 mb-4">
+                Past FOTA deployments for this device
+              </p>
+            </div>
+            <TanStackTable
+              columns={fotaHistoryColumns}
+              data={fotaHistory}
+              loading={isFotaDetailsListFetching}
+              getData={() => {}}
+              noDataLabel="No update history for this device"
+              heightClass="h-auto"
+            />
+          </section>
+        )}
 
         {/* Deployment Summary & Action */}
         <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
