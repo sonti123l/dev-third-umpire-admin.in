@@ -31,9 +31,18 @@ export const AddDetailsIntoFotaDb = async (payload: FormData) => {
   }
 };
 
-export const getFotaList = async (device_id: number) => {
+export const getFotaList = async (
+  device_id: number,
+  params?: { page?: number; page_size?: number },
+) => {
   try {
-    const result = await $fetch.get(`/${device_id}/fota-details-list`);
+    const query = new URLSearchParams();
+    if (params?.page) query.set("page", String(params.page));
+    if (params?.page_size) query.set("page_size", String(params.page_size));
+    const qs = query.toString();
+    const result = await $fetch.get(
+      `/${device_id}/fota-details-list${qs ? `?${qs}` : ""}`,
+    );
     return result;
   } catch (err) {
     throw err;

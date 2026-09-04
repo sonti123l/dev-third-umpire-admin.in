@@ -46,7 +46,7 @@ const PaginationComponent: React.FC<PaginationProps> = ({
 }) => {
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const [inputPageValue, setInputPageValue] = useState<string>(
-    initialPage.toString()
+    initialPage.toString(),
   );
   const [limitOptions, setLimitOptions] = useState<LimitOption[]>([]);
 
@@ -68,7 +68,7 @@ const PaginationComponent: React.FC<PaginationProps> = ({
             { title: "100/page", value: 100 },
             { title: "250/page", value: 250 },
             { title: "500/page", value: 500 },
-          ]
+          ],
     );
   }, [limitOptionsFromProps]);
 
@@ -102,7 +102,7 @@ const PaginationComponent: React.FC<PaginationProps> = ({
     if (e.key === "Enter") {
       const page = Math.max(
         1,
-        Math.min(parseInt(inputPageValue) || 1, totalPages)
+        Math.min(parseInt(inputPageValue) || 1, totalPages),
       );
       handlePageChange(page);
     }
@@ -148,7 +148,7 @@ const PaginationComponent: React.FC<PaginationProps> = ({
       <PaginationContent className="px-1 py-0 flex gap-5">
         <Select
           value={selectedValue?.toString()}
-          // onValueChange={handleRowChange}
+          onValueChange={handleRowChange}
         >
           <SelectTrigger className="w-24 text-xs py-0 h-6 border-gray-200">
             <SelectValue
@@ -222,7 +222,7 @@ const PaginationComponent: React.FC<PaginationProps> = ({
                   {pageNumber}
                 </PaginationLink>
               </PaginationItem>
-            )
+            ),
           )}
 
           <PaginationItem>

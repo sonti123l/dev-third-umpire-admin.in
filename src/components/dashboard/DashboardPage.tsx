@@ -447,6 +447,9 @@ export default function DashboardPage() {
     },
   );
 
+  const [fotaPage, setFotaPage] = useState<number>(1);
+  const [fotaPageSize, setFotaPageSize] = useState<number>(10);
+
   const [deviceZipFile, setDeviceZipFile] = useState<File | null>(null);
   const [webZipFile, setWebZipFile] = useState<File | null>(null);
   const [fotaZipFile, setFotaZipFile] = useState<File | null>(null);
@@ -521,9 +524,12 @@ export default function DashboardPage() {
     isFetching: isFotaDetailsListFetching,
     isError: isFotaListError,
   } = useQuery({
-    queryKey: ["fota-list", fotaForm.device_id],
+    queryKey: ["fota-list", fotaForm.device_id, fotaPage, fotaPageSize],
     queryFn: async () => {
-      const result = await getFotaList(fotaForm.device_id);
+      const result = await getFotaList(fotaForm.device_id, {
+        page: fotaPage,
+        page_size: fotaPageSize,
+      });
       return result?.data;
     },
     enabled: !!fotaForm.device_id,
@@ -532,6 +538,15 @@ export default function DashboardPage() {
   });
 
   const fotaHistory: FotaDetailsRow[] = fotaListDetails?.fotaDetails ?? [];
+  const fotaPagination = fotaListDetails?.paginationDetails;
+
+  const handleFotaTableDataChange = useCallback((params: any) => {
+    const nextPage = Number(params?.page);
+    const nextPageSize = Number(params?.page_size);
+    if (!Number.isNaN(nextPage) && nextPage > 0) setFotaPage(nextPage);
+    if (!Number.isNaN(nextPageSize) && nextPageSize > 0)
+      setFotaPageSize(nextPageSize);
+  }, []);
 
   useEffect(() => {
     if (isFotaListError) {
@@ -595,6 +610,7 @@ export default function DashboardPage() {
     setDeviceZipFile(null);
     setWebZipFile(null);
     setFotaZipFile(null);
+    setFotaPage(1);
   };
 
   const handleVersionChange = (field: keyof FotaTextFields, value: string) => {
@@ -1098,7 +1114,10 @@ export default function DashboardPage() {
               columns={fotaHistoryColumns}
               data={fotaHistory}
               loading={isFotaDetailsListFetching}
-              getData={() => {}}
+              getData={handleFotaTableDataChange}
+              paginationDetails={fotaPagination}
+              page={fotaPage}
+              page_size={fotaPageSize}
               noDataLabel="No update history for this device"
               heightClass="h-auto"
             />
