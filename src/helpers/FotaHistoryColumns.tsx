@@ -19,20 +19,33 @@ export type FotaHistoryRow = {
   createdAt: string | null;
 };
 
-const StatusPill = ({ active }: { active: boolean }) => (
-  <span
-    className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border ${
-      active
-        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-        : "bg-slate-50 text-slate-500 border-slate-200"
-    }`}
-  >
-    <span
-      className={`w-1.5 h-1.5 rounded-full ${active ? "bg-emerald-500" : "bg-slate-300"}`}
-    />
-    {active ? "Applied" : "Pending"}
-  </span>
-);
+// deviceStatus / webStatus are three-state: 0 = pending (not yet
+// attempted), 1 = success (set by /:fotaId/update-fota-status when the
+// device reports success), -1 = failed (device reported failure).
+const StatusPill = ({ value }: { value: number }) => {
+  if (value === 1) {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border bg-emerald-50 text-emerald-700 border-emerald-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+        Success
+      </span>
+    );
+  }
+  if (value === -1) {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border bg-rose-50 text-rose-700 border-rose-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+        Failed
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border bg-slate-50 text-slate-500 border-slate-200">
+      <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+      Pending
+    </span>
+  );
+};
 
 const VersionCell = ({ oldV, newV }: { oldV: string; newV: string }) => {
   if (!oldV && !newV) return <span className="text-slate-300">—</span>;
@@ -93,11 +106,11 @@ const FotaHistoryColumns = () => {
     }),
     columnHelper.accessor("deviceStatus", {
       header: "Device Status",
-      cell: (info) => <StatusPill active={info.getValue() === 1} />,
+      cell: (info) => <StatusPill value={info.getValue()} />,
     }),
     columnHelper.accessor("webStatus", {
       header: "Web Status",
-      cell: (info) => <StatusPill active={info.getValue() === 1} />,
+      cell: (info) => <StatusPill value={info.getValue()} />,
     }),
     columnHelper.accessor("fotaStatus", {
       header: "FOTA Status",
@@ -105,9 +118,7 @@ const FotaHistoryColumns = () => {
         const value = info.getValue();
         if (!value) return <span className="text-slate-300 text-xs">—</span>;
         return (
-          <span className="text-xs font-semibold text-indigo-600">
-            {value}
-          </span>
+          <span className="text-xs font-semibold text-indigo-600">{value}</span>
         );
       },
     }),
