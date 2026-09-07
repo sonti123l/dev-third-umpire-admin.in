@@ -1,5 +1,5 @@
-import LoginPage from "@/components/auth/LoginPage";
 import { createFileRoute } from "@tanstack/react-router";
+import DashboardPage from "@/components/dashboard/DashboardPage";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({
 function RouteComponent() {
   return (
     <div>
-      <LoginPage />
+      <DashboardPage />
     </div>
   );
 }
