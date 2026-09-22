@@ -948,8 +948,9 @@ export default function DashboardPage() {
                       className="h-10 px-3 w-full bg-white border border-slate-200 rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
                     />
 
-                    {fotaForm.device_old_version ===
-                    fotaForm.device_new_version ? (
+                    {fotaForm.device_new_version &&
+                    fotaForm.device_old_version ==
+                      fotaForm.device_new_version ? (
                       <p className="text-red-600 text-sm font-mono font-medium">
                         New version cannot be the same as the old version.
                       </p>
@@ -1027,7 +1028,8 @@ export default function DashboardPage() {
                       placeholder="v2.0.0"
                       className="h-10 px-3 w-full bg-white border border-slate-200 rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
                     />
-                    {fotaForm.web_old_version === fotaForm.web_new_version ? (
+                    {fotaForm.web_new_version &&
+                    fotaForm.web_old_version == fotaForm.web_new_version ? (
                       <p className="text-red-600 text-sm font-mono font-medium">
                         New version cannot be the same as the old version.
                       </p>
