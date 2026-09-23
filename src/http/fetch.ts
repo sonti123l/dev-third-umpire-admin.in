@@ -10,7 +10,12 @@ interface IAPIResponse {
 
 class FetchService {
   authStatusCodes: number[] = [401, 403, 404];
-  authErrorURLs: string[] = ["/auth/login"];
+  authErrorURLs: string[] = [
+    "/auth/login",
+    "/auth/signup",
+    "/auth/refresh-token",
+    "/refresh-token",
+  ];
 
   private activeRequests = new Map<string, AbortController>();
   private _fetchType: string;
@@ -26,19 +31,28 @@ class FetchService {
    * fota_server_id:
    * 1 -> Production
    * 2 -> Test
+   * 3 -> Local (fallback to VITE_PUBLIC_API_URL)
    */
-  private getBaseUrl(): string {
-    const serverId = localStorage.getItem("fota_server_id");
-
-    if (serverId === "1") {
-      return import.meta.env.VITE_FOTA_PRODUCTION_URL;
-    }
+  public getBaseUrl(): string {
+    const serverId =
+      typeof window !== "undefined"
+        ? localStorage.getItem("fota_server_id")
+        : "1";
 
     if (serverId === "2") {
       return import.meta.env.VITE_FOTA_TEST_URL;
     }
 
-    return import.meta.env.VITE_PUBLIC_API_URL;
+    if (serverId === "3") {
+      return import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:8787";
+    }
+
+    // In local development, connect to local backend so local auth and features work
+    if (import.meta.env.DEV) {
+      return import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:8787";
+    }
+
+    return import.meta.env.VITE_FOTA_PRODUCTION_URL;
   }
 
   configureAuthorization(config: { headers: Record<string, string> }) {
@@ -69,7 +83,9 @@ class FetchService {
   }
 
   isAuthRequest(path: string) {
-    return this.authErrorURLs.includes(path);
+    return this.authErrorURLs.some((arrayUrl: string) =>
+      path.includes(arrayUrl),
+    );
   }
 
   private getRequestKey(
@@ -88,7 +104,7 @@ class FetchService {
     const refreshToken = Cookies.get("refresh_token");
 
     if (!refreshToken) {
-      window.location.href = "/";
+      Cookies.remove("token");
       return null;
     }
 
@@ -106,35 +122,28 @@ class FetchService {
       if (!response.ok) {
         Cookies.remove("token");
         Cookies.remove("refresh_token");
-
-        window.location.href = "/";
-
         return null;
       }
 
       const data = await response.json();
 
-      Cookies.set("token", data.access_token);
+      if (data?.access_token) {
+        Cookies.set("token", data.access_token);
+        return data.access_token;
+      }
 
-      return data.access_token;
+      return null;
     } catch {
-      window.location.href = "/";
-
+      Cookies.remove("token");
+      Cookies.remove("refresh_token");
       return null;
     }
   }
 
   async hit(
-    ...args: [
-      string,
-      RequestInit &
-        {
-          allowConcurrent?: boolean;
-        }?,
-    ]
+    path: string,
+    config: RequestInit & { allowConcurrent?: boolean } = {},
   ): Promise<IAPIResponse> {
-    const [path, config = {}] = args;
-
     const method = config.method || "GET";
 
     const allowConcurrent =
@@ -164,17 +173,18 @@ class FetchService {
     /**
      * Set default headers.
      */
-    config.headers = config.headers || {};
+    const headers: Record<string, string> = (config.headers as Record<string, string>) || {};
+    config.headers = headers;
 
-    if (!config.headers["Content-Type"] && !(config.body instanceof FormData)) {
-      config.headers["Content-Type"] = "application/json";
+    if (!headers["Content-Type"] && !(config.body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
     }
 
     /**
      * Add Authorization header for non-auth requests.
      */
     if (!this.isAuthRequest(path)) {
-      this.configureAuthorization(config);
+      this.configureAuthorization({ headers });
     }
 
     /**
@@ -325,7 +335,7 @@ class FetchService {
     });
   }
 
-  async postFormData(url: string, file?: File) {
+  async postFormData(url: string, file?: File | FormData) {
     return await this.hit(url, {
       method: "POST",
       body: file,
@@ -337,16 +347,16 @@ class FetchService {
       url = prepareURLEncodedParams(url, queryParams);
     }
 
+    const headers: Record<string, string> = {};
+    if (contentType) {
+      headers["Content-Type"] = contentType;
+      headers["Accept"] = contentType;
+    }
+
     const config: RequestInit = {
       method: "GET",
+      headers,
     };
-
-    this.setDefaultHeaders(config);
-
-    if (contentType) {
-      config.headers!["Content-Type"] = contentType;
-      config.headers!["Accept"] = contentType;
-    }
 
     return this.hit(url, config);
   }

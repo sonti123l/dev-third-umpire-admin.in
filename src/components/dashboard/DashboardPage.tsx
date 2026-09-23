@@ -1,14 +1,14 @@
-import FotaHistoryColumns from "@/helpers/FotaHistoryColumns";
+
 import {
   AddDetailsIntoFotaDb,
   getDevicesDetails,
   getFotaDetailsForDevice,
-  getFotaList,
 } from "@/services/dashboardservice/dashboardService";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import TanStackTable from "../core/TanstackTable";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "@tanstack/react-router";
 
 /* ─────────────────────────── Types ─────────────────────────── */
 
@@ -267,6 +267,22 @@ const IconSignal = ({ className = "w-4 h-4" }: { className?: string }) => (
   </svg>
 );
 
+const IconLogout = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+    />
+  </svg>
+);
+
 /* ─────────────────────────── Helpers ─────────────────────────── */
 
 function formatBytes(bytes: number): string {
@@ -308,6 +324,35 @@ function StatusBadge({ status }: { status: string | null }) {
         className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-500" : "bg-amber-500"}`}
       />
       {status || "Unknown"}
+    </span>
+  );
+}
+
+function TrackStatusPill({
+  value,
+}: {
+  value: number | string | null | undefined;
+}) {
+  if (value === 1 || value === "APPLIED" || value === "SUCCESS") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+        Success
+      </span>
+    );
+  }
+  if (value === -1 || value === "FAILED") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+        Failed
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+      <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+      {typeof value === "string" && value ? value : "Pending"}
     </span>
   );
 }
@@ -428,7 +473,8 @@ function FileUploadZone({
 /* ─────────────────────────── Main Component ─────────────────────────── */
 
 export default function DashboardPage() {
-  const fotaHistoryColumns = FotaHistoryColumns();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const [fotaForm, setFotaForm] = useState<FotaTextFields>({
     device_id: 0,
@@ -442,13 +488,22 @@ export default function DashboardPage() {
 
   const [fota_update_server_id, set_fota_update_server_id] = useState<number>(
     () => {
+      if (typeof window === "undefined") return 1;
       const stored = localStorage.getItem("fota_server_id");
-      return stored ? Number(stored) : 1;
+      return stored && stored !== "3" ? Number(stored) : 1;
     },
   );
 
-  const [fotaPage, setFotaPage] = useState<number>(1);
-  const [fotaPageSize, setFotaPageSize] = useState<number>(10);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+      navigate({ to: "/login" });
+    } catch {
+      toast.error("Logout failed");
+    }
+  };
+
 
   const [deviceZipFile, setDeviceZipFile] = useState<File | null>(null);
   const [webZipFile, setWebZipFile] = useState<File | null>(null);
@@ -473,7 +528,7 @@ export default function DashboardPage() {
     refetchOnWindowFocus: true,
   });
 
-  const devicesList: DeviceListItem[] = devicesData?.list ?? [];
+  const devicesList: DeviceListItem[] = (devicesData as any)?.list ?? [];
 
   useEffect(() => {
     if (isDevicesError) {
@@ -505,17 +560,19 @@ export default function DashboardPage() {
     retry: false,
   });
 
+  const latestFotaRecord: FotaDetailsRow | null =
+    (fotaDetailsData as any)?.fotaDetails ?? null;
+
   useEffect(() => {
-    const latest = fotaDetailsData?.fotaDetails;
-    if (!latest) return;
+    if (!latestFotaRecord) return;
     setFotaForm((prev) => ({
       ...prev,
       device_old_version:
-        latest.deviceNewVersion ?? latest.deviceOldVersion ?? "",
-      web_old_version: latest.webNewVersion ?? latest.webOldVersion ?? "",
-      fota_old_version: latest.fotaNewVersion ?? latest.fotaOldVersion ?? "",
+        latestFotaRecord.deviceNewVersion ?? latestFotaRecord.deviceOldVersion ?? "",
+      web_old_version: latestFotaRecord.webNewVersion ?? latestFotaRecord.webOldVersion ?? "",
+      fota_old_version: latestFotaRecord.fotaNewVersion ?? latestFotaRecord.fotaOldVersion ?? "",
     }));
-  }, [fotaDetailsData]);
+  }, [latestFotaRecord]);
 
   useEffect(() => {
     if (!isFotaDetailsError || fotaForm.device_id === 0) return;
@@ -526,45 +583,6 @@ export default function DashboardPage() {
       fota_old_version: "",
     }));
   }, [isFotaDetailsError]);
-
-  // Full history — used to feed the update history table.
-  const {
-    data: fotaListDetails,
-    isFetching: isFotaDetailsListFetching,
-    isError: isFotaListError,
-  } = useQuery({
-    queryKey: ["fota-list", fotaForm.device_id, fotaPage, fotaPageSize],
-    queryFn: async () => {
-      const result = await getFotaList(
-        handleGetDeviceHardWareUUid(fotaForm.device_id),
-        {
-          page: fotaPage,
-          page_size: fotaPageSize,
-        },
-      );
-      return result?.data;
-    },
-    enabled: !!fotaForm.device_id,
-    staleTime: 30000,
-    retry: false,
-  });
-
-  const fotaHistory: FotaDetailsRow[] = fotaListDetails?.fotaDetails ?? [];
-  const fotaPagination = fotaListDetails?.paginationDetails ?? {};
-
-  const handleFotaTableDataChange = useCallback((params: any) => {
-    const nextPage = Number(params?.page);
-    const nextPageSize = Number(params?.page_size);
-    if (!Number.isNaN(nextPage) && nextPage > 0) setFotaPage(nextPage);
-    if (!Number.isNaN(nextPageSize) && nextPageSize > 0)
-      setFotaPageSize(nextPageSize);
-  }, []);
-
-  useEffect(() => {
-    if (isFotaListError) {
-      toast.error("Failed to load update history");
-    }
-  }, [isFotaListError]);
 
   const { mutateAsync: addFotaForDevice } = useMutation({
     mutationKey: ["fota-details-submit"],
@@ -591,7 +609,9 @@ export default function DashboardPage() {
   /* ── Handlers ── */
   const handleServerChange = (serverId: number) => {
     set_fota_update_server_id(serverId);
-    localStorage.setItem("fota_server_id", String(serverId));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fota_server_id", String(serverId));
+    }
     setFotaForm((prev) => ({
       ...prev,
       device_id: 0,
@@ -605,7 +625,9 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    localStorage.setItem("fota_server_id", String(fota_update_server_id));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("fota_server_id", String(fota_update_server_id));
+    }
   }, [fota_update_server_id]);
 
   const handleDeviceChange = (deviceId: number) => {
@@ -622,7 +644,6 @@ export default function DashboardPage() {
     setDeviceZipFile(null);
     setWebZipFile(null);
     setFotaZipFile(null);
-    setFotaPage(1);
   };
 
   const handleVersionChange = (field: keyof FotaTextFields, value: string) => {
@@ -714,32 +735,68 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-medium text-slate-500 hidden sm:inline">
-              Environment
-            </span>
-            <div className="flex bg-slate-100 p-1 rounded-xl">
-              <button
-                onClick={() => handleServerChange(1)}
-                className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
-                  fota_update_server_id === 1
-                    ? "bg-white text-indigo-600 shadow-sm"
-                    : "text-slate-500 hover:text-slate-700"
-                }`}
-              >
-                Production
-              </button>
-              <button
-                onClick={() => handleServerChange(2)}
-                className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
-                  fota_update_server_id === 2
-                    ? "bg-white text-indigo-600 shadow-sm"
-                    : "text-slate-500 hover:text-slate-700"
-                }`}
-              >
-                Test
-              </button>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-slate-500 hidden md:inline">
+                Environment
+              </span>
+              <div className="flex bg-slate-100 p-1 rounded-xl">
+                {/* Local server option (commented out for deployment)
+                <button
+                  onClick={() => handleServerChange(3)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
+                    fota_update_server_id === 3
+                      ? "bg-white text-indigo-600 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  Local (8787)
+                </button>
+                */}
+                <button
+                  onClick={() => handleServerChange(1)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
+                    fota_update_server_id === 1
+                      ? "bg-white text-indigo-600 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  Production
+                </button>
+                <button
+                  onClick={() => handleServerChange(2)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
+                    fota_update_server_id === 2
+                      ? "bg-white text-indigo-600 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  Test
+                </button>
+              </div>
             </div>
+
+            {/* User Profile & Logout */}
+            {user && (
+              <div className="flex items-center gap-2.5 pl-2 border-l border-slate-200">
+                <div className="flex flex-col text-right hidden sm:flex">
+                  <span className="text-xs font-bold text-slate-800 leading-tight">
+                    {user.name || user.email.split("@")[0]}
+                  </span>
+                  <span className="text-[10px] text-indigo-600 font-semibold uppercase tracking-wider">
+                    {user.role || "FOTA Manager"}
+                  </span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all border border-rose-200 shadow-sm"
+                  title="Log out of FOTA Manager"
+                >
+                  <IconLogout className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Logout</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -1132,28 +1189,175 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Update History Table */}
+        {/* Latest FOTA Record Card */}
         {selectedDevice && (
           <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="p-5 pb-0">
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-                Update History
-              </h2>
-              <p className="text-sm text-slate-500 mt-0.5 mb-4">
-                Past FOTA deployments for this device
-              </p>
+            <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
+                  <IconClock className="w-5 h-5 text-indigo-600" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+                      Latest Deployment Record
+                    </h2>
+                    {latestFotaRecord?.id && (
+                      <span className="text-xs font-mono font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-100">
+                        #{latestFotaRecord.id}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Most recent firmware, web, and updater release for this device
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() =>
+                  navigate({
+                    to: `/${fotaForm.device_id}/fota-information`,
+                  })
+                }
+                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 font-semibold text-xs rounded-xl border border-slate-200 hover:border-indigo-200 transition-all shadow-sm active:scale-95"
+              >
+                <span>View Full History</span>
+                <IconArrow className="w-3.5 h-3.5 text-indigo-600" />
+              </button>
             </div>
-            <TanStackTable
-              columns={fotaHistoryColumns}
-              data={fotaHistory}
-              loading={isFotaDetailsListFetching}
-              getData={handleFotaTableDataChange}
-              paginationDetails={fotaPagination}
-              page={fotaPage}
-              page_size={fotaPageSize}
-              noDataLabel="No update history for this device"
-              heightClass="h-auto"
-            />
+
+            {latestFotaRecord ? (
+              <div className="p-5 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Device Track */}
+                  <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/70">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        Device Firmware
+                      </span>
+                      <TrackStatusPill
+                        value={latestFotaRecord.deviceStatus}
+                      />
+                    </div>
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="text-sm font-mono font-semibold text-slate-800">
+                        {latestFotaRecord.deviceOldVersion || "—"}
+                      </span>
+                      <span className="text-slate-400 text-xs">→</span>
+                      <span className="text-sm font-mono font-bold text-indigo-600">
+                        {latestFotaRecord.deviceNewVersion || "—"}
+                      </span>
+                    </div>
+                    <div
+                      className="text-[11px] text-slate-500 truncate"
+                      title={
+                        latestFotaRecord.deviceFotaUrl || "No archive"
+                      }
+                    >
+                      Package:{" "}
+                      <span className="font-mono text-slate-700">
+                        {latestFotaRecord.deviceFotaUrl || "None"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Web Track */}
+                  <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/70">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        Web Application
+                      </span>
+                      <TrackStatusPill
+                        value={latestFotaRecord.webStatus}
+                      />
+                    </div>
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="text-sm font-mono font-semibold text-slate-800">
+                        {latestFotaRecord.webOldVersion || "—"}
+                      </span>
+                      <span className="text-slate-400 text-xs">→</span>
+                      <span className="text-sm font-mono font-bold text-sky-600">
+                        {latestFotaRecord.webNewVersion || "—"}
+                      </span>
+                    </div>
+                    <div
+                      className="text-[11px] text-slate-500 truncate"
+                      title={
+                        latestFotaRecord.webFotaUrl || "No archive"
+                      }
+                    >
+                      Package:{" "}
+                      <span className="font-mono text-slate-700">
+                        {latestFotaRecord.webFotaUrl || "None"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* FOTA Track */}
+                  <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/70">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        FOTA Updater
+                      </span>
+                      <TrackStatusPill
+                        value={latestFotaRecord.fotaStatus}
+                      />
+                    </div>
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="text-sm font-mono font-semibold text-slate-800">
+                        {latestFotaRecord.fotaOldVersion || "—"}
+                      </span>
+                      <span className="text-slate-400 text-xs">→</span>
+                      <span className="text-sm font-mono font-bold text-violet-600">
+                        {latestFotaRecord.fotaNewVersion || "—"}
+                      </span>
+                    </div>
+                    <div
+                      className="text-[11px] text-slate-500 truncate"
+                      title={
+                        latestFotaRecord.fotaUpdateUrl || "No archive"
+                      }
+                    >
+                      Package:{" "}
+                      <span className="font-mono text-slate-700">
+                        {latestFotaRecord.fotaUpdateUrl || "None"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer bar */}
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs text-slate-500">
+                  <div className="flex items-center gap-2">
+                    <span>Last Deployed:</span>
+                    <span className="font-medium text-slate-700">
+                      {formatDate(latestFotaRecord.createdAt)}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() =>
+                      navigate({
+                        to: `/${fotaForm.device_id}/fota-information`,
+                      })
+                    }
+                    className="text-xs text-indigo-600 font-semibold hover:underline flex items-center gap-1"
+                  >
+                    <span>View all previous updates in history table</span>
+                    <IconArrow className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-8 text-center bg-slate-50/40">
+                <p className="text-sm font-medium text-slate-600">
+                  No previous FOTA deployments recorded for this device.
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Configure versions and upload package archives above to deploy the initial release.
+                </p>
+              </div>
+            )}
           </section>
         )}
 

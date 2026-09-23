@@ -87,8 +87,10 @@ const PaginationComponent: React.FC<PaginationProps> = ({
     }
   };
 
-  const handleRowChange = (newLimit: string) => {
-    captureRowPerItems(Number(newLimit));
+  const handleRowChange = (newLimit: string | null) => {
+    if (newLimit) {
+      captureRowPerItems(Number(newLimit));
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

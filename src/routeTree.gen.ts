@@ -9,13 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LayoutUpdatesIndexRouteImport } from './routes/_layout/updates/index'
 import { Route as LayoutSettingsIndexRouteImport } from './routes/_layout/settings/index'
 import { Route as LayoutDashboardIndexRouteImport } from './routes/_layout/dashboard/index'
+import { Route as DeviceIdFotaInformationIndexRouteImport } from './routes/$deviceId/fota-information/index'
 import { Route as DevicesIdInfoIndexRouteImport } from './routes/devices/$id/info/index'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LayoutRoute = LayoutRouteImport.update({
   id: '/_layout',
   getParentRoute: () => rootRouteImport,
@@ -40,6 +47,12 @@ const LayoutDashboardIndexRoute = LayoutDashboardIndexRouteImport.update({
   path: '/dashboard/',
   getParentRoute: () => LayoutRoute,
 } as any)
+const DeviceIdFotaInformationIndexRoute =
+  DeviceIdFotaInformationIndexRouteImport.update({
+    id: '/$deviceId/fota-information/',
+    path: '/$deviceId/fota-information/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DevicesIdInfoIndexRoute = DevicesIdInfoIndexRouteImport.update({
   id: '/devices/$id/info/',
   path: '/devices/$id/info/',
@@ -48,6 +61,8 @@ const DevicesIdInfoIndexRoute = DevicesIdInfoIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/$deviceId/fota-information/': typeof DeviceIdFotaInformationIndexRoute
   '/dashboard/': typeof LayoutDashboardIndexRoute
   '/settings/': typeof LayoutSettingsIndexRoute
   '/updates/': typeof LayoutUpdatesIndexRoute
@@ -55,6 +70,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/$deviceId/fota-information': typeof DeviceIdFotaInformationIndexRoute
   '/dashboard': typeof LayoutDashboardIndexRoute
   '/settings': typeof LayoutSettingsIndexRoute
   '/updates': typeof LayoutUpdatesIndexRoute
@@ -64,6 +81,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_layout': typeof LayoutRouteWithChildren
+  '/login': typeof LoginRoute
+  '/$deviceId/fota-information/': typeof DeviceIdFotaInformationIndexRoute
   '/_layout/dashboard/': typeof LayoutDashboardIndexRoute
   '/_layout/settings/': typeof LayoutSettingsIndexRoute
   '/_layout/updates/': typeof LayoutUpdatesIndexRoute
@@ -73,16 +92,27 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/login'
+    | '/$deviceId/fota-information/'
     | '/dashboard/'
     | '/settings/'
     | '/updates/'
     | '/devices/$id/info/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/settings' | '/updates' | '/devices/$id/info'
+  to:
+    | '/'
+    | '/login'
+    | '/$deviceId/fota-information'
+    | '/dashboard'
+    | '/settings'
+    | '/updates'
+    | '/devices/$id/info'
   id:
     | '__root__'
     | '/'
     | '/_layout'
+    | '/login'
+    | '/$deviceId/fota-information/'
     | '/_layout/dashboard/'
     | '/_layout/settings/'
     | '/_layout/updates/'
@@ -92,11 +122,20 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LayoutRoute: typeof LayoutRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  DeviceIdFotaInformationIndexRoute: typeof DeviceIdFotaInformationIndexRoute
   DevicesIdInfoIndexRoute: typeof DevicesIdInfoIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_layout': {
       id: '/_layout'
       path: ''
@@ -132,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardIndexRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/$deviceId/fota-information/': {
+      id: '/$deviceId/fota-information/'
+      path: '/$deviceId/fota-information'
+      fullPath: '/$deviceId/fota-information/'
+      preLoaderRoute: typeof DeviceIdFotaInformationIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/devices/$id/info/': {
       id: '/devices/$id/info/'
       path: '/devices/$id/info'
@@ -160,6 +206,8 @@ const LayoutRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LayoutRoute: LayoutRouteWithChildren,
+  LoginRoute: LoginRoute,
+  DeviceIdFotaInformationIndexRoute: DeviceIdFotaInformationIndexRoute,
   DevicesIdInfoIndexRoute: DevicesIdInfoIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import DashboardPage from "@/components/dashboard/DashboardPage";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
@@ -7,8 +8,8 @@ export const Route = createFileRoute("/")({
 
 function RouteComponent() {
   return (
-    <div>
+    <AuthGuard>
       <DashboardPage />
-    </div>
+    </AuthGuard>
   );
 }

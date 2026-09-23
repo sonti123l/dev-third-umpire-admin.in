@@ -9,6 +9,7 @@ import {
 import appCss from "../styles.css?url";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
+import { AuthProvider } from "@/context/AuthContext";
 
 const client = new QueryClient();
 
@@ -34,9 +35,11 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <QueryClientProvider client={client}>
-      <RootDocument>
-        <Outlet />
-      </RootDocument>
+      <AuthProvider>
+        <RootDocument>
+          <Outlet />
+        </RootDocument>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
