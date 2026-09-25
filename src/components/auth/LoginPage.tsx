@@ -105,6 +105,7 @@ export default function LoginPage() {
 
         {/* Server Target Selector */}
         <div className="mt-4 inline-flex items-center gap-1.5 bg-slate-200/70 p-1 rounded-xl">
+          {/* Local server option (commented out for deployment)
           <button
             type="button"
             onClick={() => handleServerChange(3)}
@@ -116,6 +117,7 @@ export default function LoginPage() {
           >
             Local API (8787)
           </button>
+          */}
           <button
             type="button"
             onClick={() => handleServerChange(1)}

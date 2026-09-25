@@ -1,6 +1,6 @@
 import { v as require_jsx_runtime } from "../_libs/@base-ui/react+[...].mjs";
-import { t as DashboardPage } from "./DashboardPage-CR4HokVs.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/dashboard-DYmBxkfk.js
+import { t as DashboardPage } from "./DashboardPage-CvRMClXA.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/dashboard-CMMf2Wg7.js
 var import_jsx_runtime = require_jsx_runtime();
 function RouteComponent() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DashboardPage, {}) });

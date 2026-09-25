@@ -3,7 +3,7 @@ import { v as require_jsx_runtime, y as require_react } from "../_libs/@base-ui/
 import { r as useAuth } from "./AuthContext-Cji_UYzS.mjs";
 import { g as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
 import { n as toast } from "../_libs/sonner.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/login-InqYcrdv.js
+//#region node_modules/.nitro/vite/services/ssr/assets/login-DfgiOlVT.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function LoginPage() {
@@ -102,26 +102,17 @@ function LoginPage() {
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "mt-4 inline-flex items-center gap-1.5 bg-slate-200/70 p-1 rounded-xl",
-					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-							type: "button",
-							onClick: () => handleServerChange(3),
-							className: `px-3 py-1 text-xs font-semibold rounded-lg transition-all ${serverId === 3 ? "bg-white text-indigo-600 shadow-sm" : "text-slate-600 hover:text-slate-900"}`,
-							children: "Local API (8787)"
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-							type: "button",
-							onClick: () => handleServerChange(1),
-							className: `px-3 py-1 text-xs font-semibold rounded-lg transition-all ${serverId === 1 ? "bg-white text-indigo-600 shadow-sm" : "text-slate-600 hover:text-slate-900"}`,
-							children: "Production"
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-							type: "button",
-							onClick: () => handleServerChange(2),
-							className: `px-3 py-1 text-xs font-semibold rounded-lg transition-all ${serverId === 2 ? "bg-white text-indigo-600 shadow-sm" : "text-slate-600 hover:text-slate-900"}`,
-							children: "Test"
-						})
-					]
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+						type: "button",
+						onClick: () => handleServerChange(1),
+						className: `px-3 py-1 text-xs font-semibold rounded-lg transition-all ${serverId === 1 ? "bg-white text-indigo-600 shadow-sm" : "text-slate-600 hover:text-slate-900"}`,
+						children: "Production"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+						type: "button",
+						onClick: () => handleServerChange(2),
+						className: `px-3 py-1 text-xs font-semibold rounded-lg transition-all ${serverId === 2 ? "bg-white text-indigo-600 shadow-sm" : "text-slate-600 hover:text-slate-900"}`,
+						children: "Test"
+					})]
 				})
 			]
 		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {

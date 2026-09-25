@@ -754,6 +754,7 @@ export default function DashboardPage() {
                 Environment
               </span>
               <div className="flex bg-slate-100 p-1 rounded-xl">
+                {/* Local server option (commented out for deployment)
                 <button
                   onClick={() => handleServerChange(3)}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
@@ -764,6 +765,7 @@ export default function DashboardPage() {
                 >
                   Local (8787)
                 </button>
+                */}
                 <button
                   onClick={() => handleServerChange(1)}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
