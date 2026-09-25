@@ -17,6 +17,9 @@ export type FotaHistoryRow = {
   fotaUpdateUrl: string;
   fotaStatus: string;
   createdAt: string | null;
+  proposedBy?: string | null;
+  proposedByName?: string | null;
+  completedAt?: string | null;
 };
 
 // deviceStatus / webStatus are three-state: 0 = pending (not yet
@@ -119,6 +122,26 @@ const FotaHistoryColumns = () => {
         if (!value) return <span className="text-slate-300 text-xs">—</span>;
         return (
           <span className="text-xs font-semibold text-indigo-600">{value}</span>
+        );
+      },
+    }),
+    columnHelper.accessor("proposedBy", {
+      header: "Proposed By",
+      cell: (info) => {
+        const email = info.getValue();
+        const name = info.row.original.proposedByName;
+        if (!email && !name) return <span className="text-slate-300 text-xs">—</span>;
+        return (
+          <div className="flex flex-col">
+            <span className="text-xs font-medium text-slate-800">
+              {name || email}
+            </span>
+            {name && email && (
+              <span className="text-[10px] text-slate-400 font-mono">
+                {email}
+              </span>
+            )}
+          </div>
         );
       },
     }),

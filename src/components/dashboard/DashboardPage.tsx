@@ -693,6 +693,14 @@ export default function DashboardPage() {
     formData.append("fota_old_version", fotaForm.fota_old_version);
     formData.append("fota_new_version", fotaForm.fota_new_version);
 
+    if (user?.id) {
+      formData.append("user_id", String(user.id));
+    }
+    if (user?.email) {
+      formData.append("proposed_by", user.email);
+      formData.append("proposed_by_name", user.name || "");
+    }
+
     if (deviceZipFile) formData.append("device_zip", deviceZipFile);
     if (webZipFile) formData.append("web_zip", webZipFile);
     if (fotaZipFile) formData.append("fota_zip", fotaZipFile);

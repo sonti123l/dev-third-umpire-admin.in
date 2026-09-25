@@ -1,11 +1,11 @@
 import { r as __toESM } from "../_runtime.mjs";
 import { v as require_jsx_runtime, y as require_react } from "../_libs/@base-ui/react+[...].mjs";
-import { r as useAuth } from "./AuthContext-Ce3Plbr8.mjs";
+import { r as useAuth } from "./AuthContext-tqDdUJGP.mjs";
 import { g as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
-import { n as getDevicesDetails, r as getFotaDetailsForDevice, t as AddDetailsIntoFotaDb } from "./dashboardService-BbLm_zj7.mjs";
+import { n as getDevicesDetails, r as getFotaDetailsForDevice, t as AddDetailsIntoFotaDb } from "./dashboardService-BsvHuNoD.mjs";
 import { n as useQuery, t as useMutation } from "../_libs/tanstack__react-query.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/DashboardPage-DVWja1n-.js
+//#region node_modules/.nitro/vite/services/ssr/assets/DashboardPage-BpbvBIJl.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var ALLOWED_ARCHIVE_EXTENSIONS = [".zip", ".7z"];
@@ -450,6 +450,11 @@ function DashboardPage() {
 		formData.append("web_new_version", fotaForm.web_new_version);
 		formData.append("fota_old_version", fotaForm.fota_old_version);
 		formData.append("fota_new_version", fotaForm.fota_new_version);
+		if (user?.id) formData.append("user_id", String(user.id));
+		if (user?.email) {
+			formData.append("proposed_by", user.email);
+			formData.append("proposed_by_name", user.name || "");
+		}
 		if (deviceZipFile) formData.append("device_zip", deviceZipFile);
 		if (webZipFile) formData.append("web_zip", webZipFile);
 		if (fotaZipFile) formData.append("fota_zip", fotaZipFile);

@@ -1,8 +1,8 @@
 import { r as __toESM } from "../_runtime.mjs";
 import { v as require_jsx_runtime, y as require_react } from "../_libs/@base-ui/react+[...].mjs";
-import { r as useAuth } from "./AuthContext-Ce3Plbr8.mjs";
+import { r as useAuth } from "./AuthContext-tqDdUJGP.mjs";
 import { g as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/AuthGuard-D8I4GWjM.js
+//#region node_modules/.nitro/vite/services/ssr/assets/AuthGuard-L1s4H_Vi.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var AuthGuard = ({ children }) => {

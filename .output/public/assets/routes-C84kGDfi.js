@@ -1,1 +1,0 @@
-import{t as e}from"./jsx-runtime-DGeXAQPT.js";import{t}from"./DashboardPage-IuKKgBvd.js";import{t as n}from"./AuthGuard-Deq9kbGm.js";var r=e();function i(){return(0,r.jsx)(n,{children:(0,r.jsx)(t,{})})}export{i as component};

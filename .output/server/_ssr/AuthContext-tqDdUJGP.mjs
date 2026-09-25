@@ -1,7 +1,7 @@
 import { r as __toESM } from "../_runtime.mjs";
 import { v as require_jsx_runtime, y as require_react } from "../_libs/@base-ui/react+[...].mjs";
 import { t as api } from "../_libs/js-cookie.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/AuthContext-Ce3Plbr8.js
+//#region node_modules/.nitro/vite/services/ssr/assets/AuthContext-tqDdUJGP.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var arrayToUrlString = (key, value) => {
@@ -48,7 +48,9 @@ var FetchService = class {
 	* 3 -> Local (fallback to VITE_PUBLIC_API_URL)
 	*/
 	getBaseUrl() {
-		if ((typeof window !== "undefined" ? localStorage.getItem("fota_server_id") : "1") === "2") return "https://fotatest.thirdumpire.ai";
+		const serverId = typeof window !== "undefined" ? localStorage.getItem("fota_server_id") : "1";
+		if (serverId === "2") return "https://fotatest.thirdumpire.ai";
+		if (serverId === "3") return "http://localhost:8787";
 		return "https://fota.thirdumpire.ai";
 	}
 	configureAuthorization(config) {
