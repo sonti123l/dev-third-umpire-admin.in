@@ -34,25 +34,34 @@ class FetchService {
    * 3 -> Local (fallback to VITE_PUBLIC_API_URL)
    */
   public getBaseUrl(): string {
+    const isLocalhost =
+      typeof window !== "undefined" &&
+      (window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1");
+
+    const defaultServerId = isLocalhost ? "3" : "1";
+
     const serverId =
       typeof window !== "undefined"
-        ? localStorage.getItem("fota_server_id")
-        : "1";
-
-    if (serverId === "2") {
-      return import.meta.env.VITE_FOTA_TEST_URL;
-    }
+        ? localStorage.getItem("fota_server_id") || defaultServerId
+        : defaultServerId;
 
     if (serverId === "3") {
       return import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:8787";
     }
 
-    // In local development, connect to local backend so local auth and features work
-    if (import.meta.env.DEV) {
-      return import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:8787";
+    if (serverId === "2") {
+      return import.meta.env.VITE_FOTA_TEST_URL || "https://fotatest.thirdumpire.ai";
     }
 
-    return import.meta.env.VITE_FOTA_PRODUCTION_URL;
+    if (serverId === "1") {
+      if (isLocalhost && !localStorage.getItem("fota_server_id")) {
+        return import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:8787";
+      }
+      return import.meta.env.VITE_FOTA_PRODUCTION_URL || "https://fota.thirdumpire.ai";
+    }
+
+    return import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:8787";
   }
 
   configureAuthorization(config: { headers: Record<string, string> }) {

@@ -1,7 +1,7 @@
 import { v as require_jsx_runtime } from "./_libs/@base-ui/react+[...].mjs";
 import { f as Outlet, g as useNavigate } from "./_libs/@tanstack/react-router+[...].mjs";
-import { t as AuthGuard } from "./_ssr/AuthGuard-L1s4H_Vi.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/_layout-DU7ZR4NO.js
+import { t as AuthGuard } from "./_ssr/AuthGuard-CC0DF2AS.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/_layout-BW27Igzr.js
 var import_jsx_runtime = require_jsx_runtime();
 function Layout() {
 	useNavigate();

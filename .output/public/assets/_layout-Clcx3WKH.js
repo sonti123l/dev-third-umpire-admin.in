@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-DGeXAQPT.js";import{C as t,S as n}from"./index-SqGJ_0EE.js";import{t as r}from"./AuthGuard-ClIlNgQO.js";var i=e();function a(){return t(),(0,i.jsx)(`div`,{})}function o(){return(0,i.jsx)(r,{children:(0,i.jsxs)(`div`,{children:[(0,i.jsx)(a,{}),(0,i.jsx)(n,{})]})})}export{o as component};

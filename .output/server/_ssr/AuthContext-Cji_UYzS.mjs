@@ -1,7 +1,7 @@
 import { r as __toESM } from "../_runtime.mjs";
 import { v as require_jsx_runtime, y as require_react } from "../_libs/@base-ui/react+[...].mjs";
 import { t as api } from "../_libs/js-cookie.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/AuthContext-tqDdUJGP.js
+//#region node_modules/.nitro/vite/services/ssr/assets/AuthContext-Cji_UYzS.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var arrayToUrlString = (key, value) => {
@@ -48,10 +48,16 @@ var FetchService = class {
 	* 3 -> Local (fallback to VITE_PUBLIC_API_URL)
 	*/
 	getBaseUrl() {
-		const serverId = typeof window !== "undefined" ? localStorage.getItem("fota_server_id") : "1";
-		if (serverId === "2") return "https://fotatest.thirdumpire.ai";
+		const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+		const defaultServerId = isLocalhost ? "3" : "1";
+		const serverId = typeof window !== "undefined" ? localStorage.getItem("fota_server_id") || defaultServerId : defaultServerId;
 		if (serverId === "3") return "http://localhost:8787";
-		return "https://fota.thirdumpire.ai";
+		if (serverId === "2") return "https://fotatest.thirdumpire.ai";
+		if (serverId === "1") {
+			if (isLocalhost && !localStorage.getItem("fota_server_id")) return "http://localhost:8787";
+			return "https://fota.thirdumpire.ai";
+		}
+		return "http://localhost:8787";
 	}
 	configureAuthorization(config) {
 		const accessToken = api.get("token") || "";

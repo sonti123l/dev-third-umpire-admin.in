@@ -1,4 +1,4 @@
-//#region node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-BDW58rqc.js
+//#region node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-CRbkhcP2.js
 var tsrStartManifest = () => ({ routes: {
 	__root__: {
 		filePath: "C:/Users/saitr/TU_FOTA_LOCAL/dev-third-umpire-admin.in/src/routes/__root.tsx",
@@ -10,23 +10,23 @@ var tsrStartManifest = () => ({ routes: {
 			"/devices/$id/info/"
 		],
 		preloads: [
-			"/assets/index-Dj4ozUZS.js",
+			"/assets/index-SqGJ_0EE.js",
 			"/assets/jsx-runtime-DGeXAQPT.js",
 			"/assets/useRouter-Buw3_9xO.js"
 		],
 		scripts: [{ attrs: {
 			type: "module",
 			async: !0,
-			src: "/assets/index-Dj4ozUZS.js"
+			src: "/assets/index-SqGJ_0EE.js"
 		} }]
 	},
 	"/": {
 		filePath: "C:/Users/saitr/TU_FOTA_LOCAL/dev-third-umpire-admin.in/src/routes/index.tsx",
 		children: void 0,
 		preloads: [
-			"/assets/routes-TDaC73Wm.js",
-			"/assets/DashboardPage-Dc4MeVmr.js",
-			"/assets/AuthGuard-JGA5TsAo.js"
+			"/assets/routes-BBTqKeS2.js",
+			"/assets/DashboardPage-DJTjijo-.js",
+			"/assets/AuthGuard-ClIlNgQO.js"
 		]
 	},
 	"/_layout": {
@@ -36,26 +36,26 @@ var tsrStartManifest = () => ({ routes: {
 			"/_layout/settings/",
 			"/_layout/updates/"
 		],
-		preloads: ["/assets/_layout-BiQZx2bS.js", "/assets/AuthGuard-JGA5TsAo.js"]
+		preloads: ["/assets/_layout-Clcx3WKH.js", "/assets/AuthGuard-ClIlNgQO.js"]
 	},
 	"/login": {
 		filePath: "C:/Users/saitr/TU_FOTA_LOCAL/dev-third-umpire-admin.in/src/routes/login.tsx",
 		children: void 0,
-		preloads: ["/assets/login-qZ2HdEsr.js"]
+		preloads: ["/assets/login-H0kQZwNc.js"]
 	},
 	"/$deviceId/fota-information/": {
 		filePath: "C:/Users/saitr/TU_FOTA_LOCAL/dev-third-umpire-admin.in/src/routes/$deviceId/fota-information/index.tsx",
 		children: void 0,
 		preloads: [
-			"/assets/fota-information-BvOcg--7.js",
-			"/assets/dashboardService-B8B_iFLh.js",
-			"/assets/AuthGuard-JGA5TsAo.js"
+			"/assets/fota-information-Ch4FH-cx.js",
+			"/assets/dashboardService-BSIjgQ7w.js",
+			"/assets/AuthGuard-ClIlNgQO.js"
 		]
 	},
 	"/_layout/dashboard/": {
 		filePath: "C:/Users/saitr/TU_FOTA_LOCAL/dev-third-umpire-admin.in/src/routes/_layout/dashboard/index.tsx",
 		children: void 0,
-		preloads: ["/assets/dashboard-D7f4q0hd.js", "/assets/DashboardPage-Dc4MeVmr.js"]
+		preloads: ["/assets/dashboard-Cr6twTrV.js", "/assets/DashboardPage-DJTjijo-.js"]
 	},
 	"/_layout/settings/": {
 		filePath: "C:/Users/saitr/TU_FOTA_LOCAL/dev-third-umpire-admin.in/src/routes/_layout/settings/index.tsx",
@@ -70,7 +70,7 @@ var tsrStartManifest = () => ({ routes: {
 	"/devices/$id/info/": {
 		filePath: "C:/Users/saitr/TU_FOTA_LOCAL/dev-third-umpire-admin.in/src/routes/devices/$id/info/index.tsx",
 		children: void 0,
-		preloads: ["/assets/info-Q8NlmxaD.js"]
+		preloads: ["/assets/info-BJiuFJq9.js"]
 	}
 } });
 //#endregion

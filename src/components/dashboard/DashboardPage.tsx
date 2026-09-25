@@ -490,7 +490,12 @@ export default function DashboardPage() {
     () => {
       if (typeof window === "undefined") return 1;
       const stored = localStorage.getItem("fota_server_id");
-      return stored && stored !== "3" ? Number(stored) : 1;
+      if (stored) return Number(stored);
+      const isLocalhost =
+        typeof window !== "undefined" &&
+        (window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1");
+      return isLocalhost ? 3 : 1;
     },
   );
 
@@ -749,7 +754,6 @@ export default function DashboardPage() {
                 Environment
               </span>
               <div className="flex bg-slate-100 p-1 rounded-xl">
-                {/* Local server option (commented out for deployment)
                 <button
                   onClick={() => handleServerChange(3)}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
@@ -760,7 +764,6 @@ export default function DashboardPage() {
                 >
                   Local (8787)
                 </button>
-                */}
                 <button
                   onClick={() => handleServerChange(1)}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${

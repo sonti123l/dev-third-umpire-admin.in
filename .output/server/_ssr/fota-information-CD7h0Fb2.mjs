@@ -1,8 +1,8 @@
 import { r as __toESM } from "../_runtime.mjs";
 import { a as SelectItem$1, c as SelectPositioner, d as SelectValue$1, f as SelectTrigger$1, h as Input, i as SelectItemIndicator, l as SelectPortal, m as Button, n as SelectScrollDownArrow, o as SelectList, p as SelectRoot, r as SelectItemText, s as SelectPopup, t as SelectScrollUpArrow, u as SelectIcon, v as require_jsx_runtime, y as require_react } from "../_libs/@base-ui/react+[...].mjs";
 import { _ as useParams, g as useNavigate, l as useLocation, v as useRouter } from "../_libs/@tanstack/react-router+[...].mjs";
-import { t as AuthGuard } from "./AuthGuard-L1s4H_Vi.mjs";
-import { i as getFotaList, n as getDevicesDetails } from "./dashboardService-BsvHuNoD.mjs";
+import { t as AuthGuard } from "./AuthGuard-CC0DF2AS.mjs";
+import { i as getFotaList, n as getDevicesDetails } from "./dashboardService-DFj4idLN.mjs";
 import { n as useQuery } from "../_libs/tanstack__react-query.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
 import { a as getFilteredRowModel, i as getCoreRowModel, n as useReactTable, o as getSortedRowModel, r as createColumnHelper, t as flexRender } from "../_libs/@tanstack/react-table+[...].mjs";
@@ -10,7 +10,7 @@ import { n as clsx, t as cva } from "../_libs/class-variance-authority+clsx.mjs"
 import { t as twMerge } from "../_libs/tailwind-merge.mjs";
 import { a as ChevronDown, i as ChevronLeft, n as ChevronUp, o as Check, r as ChevronRight, t as Ellipsis } from "../_libs/lucide-react.mjs";
 import { t as require_dayjs_min } from "../_libs/dayjs.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/fota-information-rP55ZAda.js
+//#region node_modules/.nitro/vite/services/ssr/assets/fota-information-CD7h0Fb2.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var import_dayjs_min = /* @__PURE__ */ __toESM(require_dayjs_min());

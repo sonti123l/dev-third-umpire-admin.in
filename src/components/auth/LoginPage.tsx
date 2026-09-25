@@ -17,7 +17,11 @@ export default function LoginPage() {
   const [serverId, setServerId] = useState<number>(() => {
     if (typeof window === "undefined") return 1;
     const stored = localStorage.getItem("fota_server_id");
-    return stored && stored !== "3" ? Number(stored) : 1; // default to 1 (Production)
+    if (stored) return Number(stored);
+    const isLocalhost =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+    return isLocalhost ? 3 : 1;
   });
 
   const handleServerChange = (id: number) => {
@@ -101,7 +105,6 @@ export default function LoginPage() {
 
         {/* Server Target Selector */}
         <div className="mt-4 inline-flex items-center gap-1.5 bg-slate-200/70 p-1 rounded-xl">
-          {/* Local server option (commented out for deployment)
           <button
             type="button"
             onClick={() => handleServerChange(3)}
@@ -113,7 +116,6 @@ export default function LoginPage() {
           >
             Local API (8787)
           </button>
-          */}
           <button
             type="button"
             onClick={() => handleServerChange(1)}

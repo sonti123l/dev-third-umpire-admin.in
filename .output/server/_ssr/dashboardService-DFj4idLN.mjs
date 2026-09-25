@@ -1,5 +1,5 @@
-import { t as $fetch } from "./AuthContext-tqDdUJGP.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/dashboardService-BsvHuNoD.js
+import { t as $fetch } from "./AuthContext-Cji_UYzS.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/dashboardService-DFj4idLN.js
 var getDevicesDetails = async () => {
 	try {
 		return await $fetch.get("/devices-list");

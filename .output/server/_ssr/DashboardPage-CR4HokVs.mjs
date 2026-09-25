@@ -1,11 +1,11 @@
 import { r as __toESM } from "../_runtime.mjs";
 import { v as require_jsx_runtime, y as require_react } from "../_libs/@base-ui/react+[...].mjs";
-import { r as useAuth } from "./AuthContext-tqDdUJGP.mjs";
+import { r as useAuth } from "./AuthContext-Cji_UYzS.mjs";
 import { g as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
-import { n as getDevicesDetails, r as getFotaDetailsForDevice, t as AddDetailsIntoFotaDb } from "./dashboardService-BsvHuNoD.mjs";
+import { n as getDevicesDetails, r as getFotaDetailsForDevice, t as AddDetailsIntoFotaDb } from "./dashboardService-DFj4idLN.mjs";
 import { n as useQuery, t as useMutation } from "../_libs/tanstack__react-query.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/DashboardPage-BpbvBIJl.js
+//#region node_modules/.nitro/vite/services/ssr/assets/DashboardPage-CR4HokVs.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var ALLOWED_ARCHIVE_EXTENSIONS = [".zip", ".7z"];
@@ -314,7 +314,8 @@ function DashboardPage() {
 	const [fota_update_server_id, set_fota_update_server_id] = (0, import_react.useState)(() => {
 		if (typeof window === "undefined") return 1;
 		const stored = localStorage.getItem("fota_server_id");
-		return stored && stored !== "3" ? Number(stored) : 1;
+		if (stored) return Number(stored);
+		return typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? 3 : 1;
 	});
 	const handleLogout = async () => {
 		try {
@@ -502,15 +503,23 @@ function DashboardPage() {
 								children: "Environment"
 							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 								className: "flex bg-slate-100 p-1 rounded-xl",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-									onClick: () => handleServerChange(1),
-									className: `px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${fota_update_server_id === 1 ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`,
-									children: "Production"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-									onClick: () => handleServerChange(2),
-									className: `px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${fota_update_server_id === 2 ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`,
-									children: "Test"
-								})]
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+										onClick: () => handleServerChange(3),
+										className: `px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${fota_update_server_id === 3 ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`,
+										children: "Local (8787)"
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+										onClick: () => handleServerChange(1),
+										className: `px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${fota_update_server_id === 1 ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`,
+										children: "Production"
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+										onClick: () => handleServerChange(2),
+										className: `px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${fota_update_server_id === 2 ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`,
+										children: "Test"
+									})
+								]
 							})]
 						}), user && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "flex items-center gap-2.5 pl-2 border-l border-slate-200",
