@@ -1,7 +1,7 @@
 import { v as require_jsx_runtime } from "../_libs/@base-ui/react+[...].mjs";
 import { t as AuthGuard } from "./AuthGuard-CC0DF2AS.mjs";
-import { t as DashboardPage } from "./DashboardPage-DpTXViGa.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/routes-DMYSpJfz.js
+import { t as DashboardPage } from "./DashboardPage-cKBHEaH8.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/routes-MLAxe1g5.js
 var import_jsx_runtime = require_jsx_runtime();
 function RouteComponent() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AuthGuard, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DashboardPage, {}) });

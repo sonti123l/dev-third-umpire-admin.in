@@ -552,6 +552,11 @@ export default function DashboardPage() {
 
   const devicesList: DeviceListItem[] = (devicesData as any)?.list ?? [];
 
+  const selectedDevice = useMemo(
+    () => devicesList.find((d) => d.id === fotaForm.device_id) ?? null,
+    [devicesList, fotaForm.device_id],
+  );
+
   useEffect(() => {
     if (isDevicesError) {
       toast.error((devicesError as Error)?.message || "Failed to load devices");
@@ -653,11 +658,6 @@ export default function DashboardPage() {
   });
 
   /* ── Derived ── */
-  const selectedDevice = useMemo(
-    () => devicesList.find((d) => d.id === fotaForm.device_id) ?? null,
-    [devicesList, fotaForm.device_id],
-  );
-
   const isDeviceTrackActive = Boolean(
     fotaForm.device_new_version || deviceZipFile,
   );
