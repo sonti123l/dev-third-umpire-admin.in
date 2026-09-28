@@ -10,7 +10,7 @@ import { n as clsx, t as cva } from "../_libs/class-variance-authority+clsx.mjs"
 import { t as twMerge } from "../_libs/tailwind-merge.mjs";
 import { a as ChevronDown, i as ChevronLeft, n as ChevronUp, o as Check, r as ChevronRight, t as Ellipsis } from "../_libs/lucide-react.mjs";
 import { t as require_dayjs_min } from "../_libs/dayjs.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/fota-information-CD7h0Fb2.js
+//#region node_modules/.nitro/vite/services/ssr/assets/fota-information-BVvntHLr.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var import_dayjs_min = /* @__PURE__ */ __toESM(require_dayjs_min());
@@ -548,8 +548,8 @@ var StatusPill = ({ value }) => {
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-rose-500" }), "Failed"]
 	});
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-		className: "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border bg-slate-50 text-slate-500 border-slate-200",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-slate-300" }), "Pending"]
+		className: "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border bg-amber-50 text-amber-700 border-amber-200",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" }), "Pending"]
 	});
 };
 var VersionCell = ({ oldV, newV }) => {

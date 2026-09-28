@@ -5,9 +5,137 @@ import { g as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
 import { n as getDevicesDetails, r as getFotaDetailsForDevice, t as AddDetailsIntoFotaDb } from "./dashboardService-DFj4idLN.mjs";
 import { n as useQuery, t as useMutation } from "../_libs/tanstack__react-query.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/DashboardPage-CvRMClXA.js
+//#region node_modules/.nitro/vite/services/ssr/assets/DashboardPage-DpTXViGa.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
+/**
+* Version utility functions for Semantic Versioning (SemVer)
+* validation, comparison, and manipulation.
+*/
+/**
+* Parses a version string into an array of numbers.
+* Supports "1.0.0", "v1.2.3", "2.1", "1.2.3.4", etc.
+* Normalizes 2 parts to 3 parts (e.g. "1.2" -> [1, 2, 0]).
+* Returns null if the format is invalid.
+*/
+function parseVersion(version) {
+	if (!version || typeof version !== "string") return null;
+	const trimmed = version.trim();
+	if (!trimmed) return null;
+	if (!trimmed.match(/^v?(\d+)\.(\d+)(?:\.(\d+))?(?:\.(\d+))?$/i)) return null;
+	const rawParts = trimmed.replace(/^v/i, "").split(".");
+	const numbers = [];
+	for (const part of rawParts) {
+		if (!/^\d+$/.test(part)) return null;
+		const num = parseInt(part, 10);
+		if (isNaN(num) || num < 0) return null;
+		numbers.push(num);
+	}
+	while (numbers.length < 3) numbers.push(0);
+	return numbers;
+}
+/**
+* Compares two versions numerically.
+* Returns:
+*   1 if v1 > v2
+*  -1 if v1 < v2
+*   0 if v1 === v2
+*  null if either version is invalid
+*/
+function compareVersions(v1, v2) {
+	const p1 = parseVersion(v1);
+	const p2 = parseVersion(v2);
+	if (!p1 || !p2) return null;
+	const maxLen = Math.max(p1.length, p2.length);
+	for (let i = 0; i < maxLen; i++) {
+		const num1 = p1[i] ?? 0;
+		const num2 = p2[i] ?? 0;
+		if (num1 > num2) return 1;
+		if (num1 < num2) return -1;
+	}
+	return 0;
+}
+/**
+* Comprehensive validation function for new versions against current version.
+*/
+function validateVersion(newVersion, currentVersion) {
+	if (!newVersion || !newVersion.trim()) return {
+		isValid: false,
+		isGreater: false
+	};
+	const trimmedNew = newVersion.trim();
+	const pNew = parseVersion(trimmedNew);
+	if (!pNew) return {
+		isValid: false,
+		isGreater: false,
+		error: `Invalid version format. Use Semantic Versioning (e.g. 1.0.0 or v1.0.0).`
+	};
+	const cleanCurrent = (currentVersion || "").trim();
+	if (!cleanCurrent || cleanCurrent === "0.0.0" || cleanCurrent.toLowerCase() === "unknown" || cleanCurrent === "—") {
+		if (!pNew.some((n) => n > 0)) return {
+			isValid: false,
+			isGreater: false,
+			error: "Version must be greater than 0.0.0."
+		};
+		return {
+			isValid: true,
+			isGreater: true
+		};
+	}
+	const cmp = compareVersions(trimmedNew, cleanCurrent);
+	if (cmp === null) return {
+		isValid: true,
+		isGreater: true
+	};
+	if (cmp === 0) return {
+		isValid: false,
+		isGreater: false,
+		error: `New version (${trimmedNew}) cannot be the same as current version (${cleanCurrent}).`
+	};
+	if (cmp < 0) return {
+		isValid: false,
+		isGreater: false,
+		error: `Downgrade not allowed. New version (${trimmedNew}) must be strictly greater than current version (${cleanCurrent}).`
+	};
+	return {
+		isValid: true,
+		isGreater: true
+	};
+}
+/**
+* Generates the next version based on the current version and bump type.
+*/
+function bumpVersion(currentVersion, type) {
+	const raw = (currentVersion || "").trim();
+	const hasV = raw.toLowerCase().startsWith("v");
+	let [major, minor, patch] = parseVersion(raw) || [
+		1,
+		0,
+		0
+	];
+	if (type === "major") {
+		major += 1;
+		minor = 0;
+		patch = 0;
+	} else if (type === "minor") {
+		minor += 1;
+		patch = 0;
+	} else if (type === "patch") patch += 1;
+	const result = `${major}.${minor}.${patch}`;
+	return hasV ? `v${result}` : result;
+}
+var IconAlertCircle = ({ className = "w-4 h-4" }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", {
+	className,
+	fill: "none",
+	stroke: "currentColor",
+	viewBox: "0 0 24 24",
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", {
+		strokeLinecap: "round",
+		strokeLinejoin: "round",
+		strokeWidth: 2,
+		d: "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+	})
+});
 var ALLOWED_ARCHIVE_EXTENSIONS = [".zip", ".7z"];
 var IconServer = ({ className = "w-5 h-5" }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", {
 	className,
@@ -217,8 +345,8 @@ function TrackStatusPill({ value }) {
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-rose-500" }), "Failed"]
 	});
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-		className: "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-slate-400" }), typeof value === "string" && value ? value : "Pending"]
+		className: "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" }), typeof value === "string" && value ? value : "Pending"]
 	});
 }
 function FileUploadZone({ file, onFileChange, disabled, label, dragActive, onDrag }) {
@@ -356,14 +484,25 @@ function DashboardPage() {
 	});
 	const latestFotaRecord = fotaDetailsData?.fotaDetails ?? null;
 	(0, import_react.useEffect)(() => {
-		if (!latestFotaRecord) return;
+		if (!latestFotaRecord) {
+			if (selectedDevice) setFotaForm((prev) => ({
+				...prev,
+				device_old_version: selectedDevice.firmwareVersion || selectedDevice.deviceVersion || "0.0.0",
+				web_old_version: selectedDevice?.web_version || "0.0.0",
+				fota_old_version: "0.0.0"
+			}));
+			return;
+		}
+		const deviceCurrent = (latestFotaRecord.deviceStatus === 1 ? latestFotaRecord.deviceNewVersion : null) || latestFotaRecord.deviceOldVersion || selectedDevice?.firmwareVersion || selectedDevice?.deviceVersion || "0.0.0";
+		const webCurrent = (latestFotaRecord.webStatus === 1 ? latestFotaRecord.webNewVersion : null) || latestFotaRecord.webOldVersion || selectedDevice?.web_version || "0.0.0";
+		const fotaCurrent = (latestFotaRecord.fotaStatus === "APPLIED" || latestFotaRecord.fotaStatus === "SUCCESS" ? latestFotaRecord.fotaNewVersion : null) || latestFotaRecord.fotaOldVersion || "0.0.0";
 		setFotaForm((prev) => ({
 			...prev,
-			device_old_version: latestFotaRecord.deviceNewVersion ?? latestFotaRecord.deviceOldVersion ?? "",
-			web_old_version: latestFotaRecord.webNewVersion ?? latestFotaRecord.webOldVersion ?? "",
-			fota_old_version: latestFotaRecord.fotaNewVersion ?? latestFotaRecord.fotaOldVersion ?? ""
+			device_old_version: deviceCurrent,
+			web_old_version: webCurrent,
+			fota_old_version: fotaCurrent
 		}));
-	}, [latestFotaRecord]);
+	}, [latestFotaRecord, selectedDevice]);
 	(0, import_react.useEffect)(() => {
 		if (!isFotaDetailsError || fotaForm.device_id === 0) return;
 		setFotaForm((prev) => ({
@@ -380,9 +519,35 @@ function DashboardPage() {
 		}
 	});
 	const selectedDevice = (0, import_react.useMemo)(() => devicesList.find((d) => d.id === fotaForm.device_id) ?? null, [devicesList, fotaForm.device_id]);
-	const hasAnyNewVersion = Boolean(fotaForm.device_new_version || fotaForm.web_new_version || fotaForm.fota_new_version);
-	const hasAnyFile = Boolean(deviceZipFile || webZipFile || fotaZipFile);
-	let canSubmit = fotaForm.device_id > 0 && (hasAnyNewVersion || hasAnyFile);
+	const isDeviceTrackActive = Boolean(fotaForm.device_new_version || deviceZipFile);
+	const isWebTrackActive = Boolean(fotaForm.web_new_version || webZipFile);
+	const isFotaTrackActive = Boolean(fotaForm.fota_new_version || fotaZipFile);
+	const hasAnyTrackActive = isDeviceTrackActive || isWebTrackActive || isFotaTrackActive;
+	const deviceValidation = (0, import_react.useMemo)(() => validateVersion(fotaForm.device_new_version, fotaForm.device_old_version), [fotaForm.device_new_version, fotaForm.device_old_version]);
+	const webValidation = (0, import_react.useMemo)(() => validateVersion(fotaForm.web_new_version, fotaForm.web_old_version), [fotaForm.web_new_version, fotaForm.web_old_version]);
+	const fotaValidation = (0, import_react.useMemo)(() => validateVersion(fotaForm.fota_new_version, fotaForm.fota_old_version), [fotaForm.fota_new_version, fotaForm.fota_old_version]);
+	const canSubmit = (0, import_react.useMemo)(() => {
+		if (!fotaForm.device_id || !hasAnyTrackActive) return false;
+		if (isDeviceTrackActive) {
+			if (!deviceValidation.isValid || !deviceValidation.isGreater) return false;
+		}
+		if (isWebTrackActive) {
+			if (!webValidation.isValid || !webValidation.isGreater) return false;
+		}
+		if (isFotaTrackActive) {
+			if (!fotaValidation.isValid || !fotaValidation.isGreater) return false;
+		}
+		return true;
+	}, [
+		fotaForm.device_id,
+		hasAnyTrackActive,
+		isDeviceTrackActive,
+		deviceValidation,
+		isWebTrackActive,
+		webValidation,
+		isFotaTrackActive,
+		fotaValidation
+	]);
 	const handleServerChange = (serverId) => {
 		set_fota_update_server_id(serverId);
 		if (typeof window !== "undefined") localStorage.setItem("fota_server_id", String(serverId));
@@ -416,8 +581,7 @@ function DashboardPage() {
 		setFotaZipFile(null);
 	};
 	const handleVersionChange = (field, value) => {
-		if (fotaForm.device_old_version == value || fotaForm.web_old_version == value) canSubmit = false;
-		else setFotaForm((prev) => ({
+		setFotaForm((prev) => ({
 			...prev,
 			[field]: value
 		}));
@@ -439,8 +603,20 @@ function DashboardPage() {
 			toast.error("Please select a device first");
 			return;
 		}
-		if (!hasAnyNewVersion && !hasAnyFile) {
+		if (!hasAnyTrackActive) {
 			toast.error("Please provide at least one new version or upload a file");
+			return;
+		}
+		if (isDeviceTrackActive && (!deviceValidation.isValid || !deviceValidation.isGreater)) {
+			toast.error(deviceValidation.error || "Device new version is invalid or not greater than current version");
+			return;
+		}
+		if (isWebTrackActive && (!webValidation.isValid || !webValidation.isGreater)) {
+			toast.error(webValidation.error || "Web new version is invalid or not greater than current version");
+			return;
+		}
+		if (isFotaTrackActive && (!fotaValidation.isValid || !fotaValidation.isGreater)) {
+			toast.error(fotaValidation.error || "FOTA new version is invalid or not greater than current version");
 			return;
 		}
 		const formData = new FormData();
@@ -472,7 +648,8 @@ function DashboardPage() {
 			setWebZipFile(null);
 			setFotaZipFile(null);
 		} catch (err) {
-			toast.error("Failed to deploy FOTA update");
+			const errMsg = err?.response?.data?.error || err?.data?.error || err?.message || "Failed to deploy FOTA update";
+			toast.error(errMsg);
 		}
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
@@ -686,63 +863,124 @@ function DashboardPage() {
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "h-1 bg-indigo-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "p-5 flex-1 flex flex-col",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center gap-3 mb-5",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-											className: "w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center",
-											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconChip, { className: "w-5 h-5 text-indigo-600" })
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-											className: "text-sm font-bold text-slate-900",
-											children: "Device Firmware"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-											className: "text-[11px] text-slate-500",
-											children: "Core system package"
-										})] })]
+										className: "flex items-center justify-between mb-5",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-center gap-3",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+												className: "w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center",
+												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconChip, { className: "w-5 h-5 text-indigo-600" })
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+												className: "text-sm font-bold text-slate-900",
+												children: "Device Firmware"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+												className: "text-[11px] text-slate-500",
+												children: "Core system package"
+											})] })]
+										}), isDeviceTrackActive ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+											className: "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" }), "Pending Update"]
+										}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+											className: "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-emerald-500" }), "Success by default"]
+										})]
 									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "space-y-4 flex-1",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "grid grid-cols-[1fr_auto_1fr] gap-2 items-end",
-											children: [
-												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-													className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
-													children: "Current"
-												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-													className: `h-10 px-3 flex items-center rounded-lg border text-sm font-mono font-medium ${isFotaDetailsFetching ? "bg-indigo-50/50 border-indigo-100 text-indigo-400 animate-pulse" : "bg-slate-50 border-slate-200 text-slate-600"}`,
-													children: isFotaDetailsFetching ? "Loading..." : fotaForm.device_old_version || "—"
-												})] }),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-													className: "pb-2.5 text-slate-300",
-													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconArrow, { className: "w-4 h-4" })
-												}),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "grid grid-cols-[1fr_auto_1fr] gap-2 items-end",
+												children: [
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+														className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
+														children: "Current"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+														className: `h-10 px-3 flex items-center rounded-lg border text-sm font-mono font-medium ${isFotaDetailsFetching ? "bg-indigo-50/50 border-indigo-100 text-indigo-400 animate-pulse" : "bg-slate-50 border-slate-200 text-slate-600"}`,
+														children: isFotaDetailsFetching ? "Loading..." : fotaForm.device_old_version || "0.0.0"
+													})] }),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+														className: "pb-2.5 text-slate-300",
+														children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconArrow, { className: "w-4 h-4" })
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
 														className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
 														children: "New"
-													}),
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
 														type: "text",
 														value: fotaForm.device_new_version,
 														onChange: (e) => handleVersionChange("device_new_version", e.target.value),
 														disabled: !fotaForm.device_id,
-														placeholder: "v1.2.0",
-														className: "h-10 px-3 w-full bg-white border border-slate-200 rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
+														placeholder: "e.g. 1.2.0 or v1.2.0",
+														className: `h-10 px-3 w-full bg-white border rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none transition-all disabled:bg-slate-50 disabled:cursor-not-allowed ${fotaForm.device_new_version ? deviceValidation.isValid && deviceValidation.isGreater ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 bg-emerald-50/20" : "border-rose-400 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20" : "border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"}`
+													})] })
+												]
+											}),
+											fotaForm.device_new_version && !deviceValidation.isValid && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+												className: "text-rose-600 text-xs font-medium flex items-center gap-1.5",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconAlertCircle, { className: "w-3.5 h-3.5 shrink-0 text-rose-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: deviceValidation.error })]
+											}),
+											fotaForm.device_new_version && deviceValidation.isValid && deviceValidation.isGreater && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+												className: "text-emerald-600 text-xs font-medium flex items-center gap-1.5",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconCheck, { className: "w-3.5 h-3.5 shrink-0 text-emerald-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+													"Valid upgrade: ",
+													fotaForm.device_old_version || "0.0.0",
+													" → ",
+													fotaForm.device_new_version
+												] })]
+											}),
+											!fotaForm.device_new_version && deviceZipFile && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+												className: "text-amber-600 text-xs font-medium flex items-center gap-1.5",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconAlertCircle, { className: "w-3.5 h-3.5 shrink-0 text-amber-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Package archive attached — enter a greater target version" })]
+											}),
+											fotaForm.device_id > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex flex-wrap items-center gap-1.5 pt-1",
+												children: [
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-[10px] uppercase font-bold text-slate-400 mr-1",
+														children: "Quick Bump:"
 													}),
-													fotaForm.device_new_version && fotaForm.device_old_version == fotaForm.device_new_version ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-														className: "text-red-600 text-sm font-mono font-medium",
-														children: "New version cannot be the same as the old version."
-													}) : null
-												] })
-											]
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-											className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
-											children: "Package Archive"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileUploadZone, {
-											file: deviceZipFile,
-											onFileChange: handleFileChange(setDeviceZipFile),
-											disabled: !fotaForm.device_id,
-											label: "device",
-											dragActive: dragActiveZone === "device",
-											onDrag: (active) => setDragActiveZone(active ? "device" : null)
-										})] })]
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+														type: "button",
+														onClick: () => handleVersionChange("device_new_version", bumpVersion(fotaForm.device_old_version, "patch")),
+														className: "text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200",
+														children: [
+															"+Patch (",
+															bumpVersion(fotaForm.device_old_version, "patch"),
+															")"
+														]
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+														type: "button",
+														onClick: () => handleVersionChange("device_new_version", bumpVersion(fotaForm.device_old_version, "minor")),
+														className: "text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200",
+														children: [
+															"+Minor (",
+															bumpVersion(fotaForm.device_old_version, "minor"),
+															")"
+														]
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+														type: "button",
+														onClick: () => handleVersionChange("device_new_version", bumpVersion(fotaForm.device_old_version, "major")),
+														className: "text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200",
+														children: [
+															"+Major (",
+															bumpVersion(fotaForm.device_old_version, "major"),
+															")"
+														]
+													})
+												]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+												className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
+												children: "Package Archive"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileUploadZone, {
+												file: deviceZipFile,
+												onFileChange: handleFileChange(setDeviceZipFile),
+												disabled: !fotaForm.device_id,
+												label: "device",
+												dragActive: dragActiveZone === "device",
+												onDrag: (active) => setDragActiveZone(active ? "device" : null)
+											})] })
+										]
 									})]
 								})]
 							}),
@@ -751,63 +989,124 @@ function DashboardPage() {
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "h-1 bg-sky-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "p-5 flex-1 flex flex-col",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center gap-3 mb-5",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-											className: "w-10 h-10 bg-sky-50 rounded-xl flex items-center justify-center",
-											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconGlobe, { className: "w-5 h-5 text-sky-600" })
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-											className: "text-sm font-bold text-slate-900",
-											children: "Web Application"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-											className: "text-[11px] text-slate-500",
-											children: "Frontend bundle"
-										})] })]
+										className: "flex items-center justify-between mb-5",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-center gap-3",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+												className: "w-10 h-10 bg-sky-50 rounded-xl flex items-center justify-center",
+												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconGlobe, { className: "w-5 h-5 text-sky-600" })
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+												className: "text-sm font-bold text-slate-900",
+												children: "Web Application"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+												className: "text-[11px] text-slate-500",
+												children: "Frontend bundle"
+											})] })]
+										}), isWebTrackActive ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+											className: "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" }), "Pending Update"]
+										}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+											className: "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-emerald-500" }), "Success by default"]
+										})]
 									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "space-y-4 flex-1",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "grid grid-cols-[1fr_auto_1fr] gap-2 items-end",
-											children: [
-												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-													className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
-													children: "Current"
-												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-													className: `h-10 px-3 flex items-center rounded-lg border text-sm font-mono font-medium ${isFotaDetailsFetching ? "bg-sky-50/50 border-sky-100 text-sky-400 animate-pulse" : "bg-slate-50 border-slate-200 text-slate-600"}`,
-													children: isFotaDetailsFetching ? "Loading..." : fotaForm.web_old_version || "—"
-												})] }),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-													className: "pb-2.5 text-slate-300",
-													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconArrow, { className: "w-4 h-4" })
-												}),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "grid grid-cols-[1fr_auto_1fr] gap-2 items-end",
+												children: [
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+														className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
+														children: "Current"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+														className: `h-10 px-3 flex items-center rounded-lg border text-sm font-mono font-medium ${isFotaDetailsFetching ? "bg-sky-50/50 border-sky-100 text-sky-400 animate-pulse" : "bg-slate-50 border-slate-200 text-slate-600"}`,
+														children: isFotaDetailsFetching ? "Loading..." : fotaForm.web_old_version || "0.0.0"
+													})] }),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+														className: "pb-2.5 text-slate-300",
+														children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconArrow, { className: "w-4 h-4" })
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
 														className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
 														children: "New"
-													}),
-													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
 														type: "text",
 														value: fotaForm.web_new_version,
 														onChange: (e) => handleVersionChange("web_new_version", e.target.value),
 														disabled: !fotaForm.device_id,
-														placeholder: "v2.0.0",
-														className: "h-10 px-3 w-full bg-white border border-slate-200 rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
+														placeholder: "e.g. 2.0.0 or v2.0.0",
+														className: `h-10 px-3 w-full bg-white border rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none transition-all disabled:bg-slate-50 disabled:cursor-not-allowed ${fotaForm.web_new_version ? webValidation.isValid && webValidation.isGreater ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 bg-emerald-50/20" : "border-rose-400 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20" : "border-slate-200 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"}`
+													})] })
+												]
+											}),
+											fotaForm.web_new_version && !webValidation.isValid && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+												className: "text-rose-600 text-xs font-medium flex items-center gap-1.5",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconAlertCircle, { className: "w-3.5 h-3.5 shrink-0 text-rose-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: webValidation.error })]
+											}),
+											fotaForm.web_new_version && webValidation.isValid && webValidation.isGreater && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+												className: "text-emerald-600 text-xs font-medium flex items-center gap-1.5",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconCheck, { className: "w-3.5 h-3.5 shrink-0 text-emerald-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+													"Valid upgrade: ",
+													fotaForm.web_old_version || "0.0.0",
+													" → ",
+													fotaForm.web_new_version
+												] })]
+											}),
+											!fotaForm.web_new_version && webZipFile && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+												className: "text-amber-600 text-xs font-medium flex items-center gap-1.5",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconAlertCircle, { className: "w-3.5 h-3.5 shrink-0 text-amber-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Package archive attached — enter a greater target version" })]
+											}),
+											fotaForm.device_id > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex flex-wrap items-center gap-1.5 pt-1",
+												children: [
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-[10px] uppercase font-bold text-slate-400 mr-1",
+														children: "Quick Bump:"
 													}),
-													fotaForm.web_new_version && fotaForm.web_old_version == fotaForm.web_new_version ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-														className: "text-red-600 text-sm font-mono font-medium",
-														children: "New version cannot be the same as the old version."
-													}) : null
-												] })
-											]
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-											className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
-											children: "Package Archive"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileUploadZone, {
-											file: webZipFile,
-											onFileChange: handleFileChange(setWebZipFile),
-											disabled: !fotaForm.device_id,
-											label: "web",
-											dragActive: dragActiveZone === "web",
-											onDrag: (active) => setDragActiveZone(active ? "web" : null)
-										})] })]
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+														type: "button",
+														onClick: () => handleVersionChange("web_new_version", bumpVersion(fotaForm.web_old_version, "patch")),
+														className: "text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-sky-50 hover:text-sky-600 text-slate-600 transition-colors border border-slate-200",
+														children: [
+															"+Patch (",
+															bumpVersion(fotaForm.web_old_version, "patch"),
+															")"
+														]
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+														type: "button",
+														onClick: () => handleVersionChange("web_new_version", bumpVersion(fotaForm.web_old_version, "minor")),
+														className: "text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-sky-50 hover:text-sky-600 text-slate-600 transition-colors border border-slate-200",
+														children: [
+															"+Minor (",
+															bumpVersion(fotaForm.web_old_version, "minor"),
+															")"
+														]
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+														type: "button",
+														onClick: () => handleVersionChange("web_new_version", bumpVersion(fotaForm.web_old_version, "major")),
+														className: "text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-sky-50 hover:text-sky-600 text-slate-600 transition-colors border border-slate-200",
+														children: [
+															"+Major (",
+															bumpVersion(fotaForm.web_old_version, "major"),
+															")"
+														]
+													})
+												]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+												className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
+												children: "Package Archive"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileUploadZone, {
+												file: webZipFile,
+												onFileChange: handleFileChange(setWebZipFile),
+												disabled: !fotaForm.device_id,
+												label: "web",
+												dragActive: dragActiveZone === "web",
+												onDrag: (active) => setDragActiveZone(active ? "web" : null)
+											})] })
+										]
 									})]
 								})]
 							}),
@@ -816,56 +1115,124 @@ function DashboardPage() {
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "h-1 bg-violet-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "p-5 flex-1 flex flex-col",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center gap-3 mb-5",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-											className: "w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center",
-											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconRefresh, { className: "w-5 h-5 text-violet-600" })
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-											className: "text-sm font-bold text-slate-900",
-											children: "FOTA Updater"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-											className: "text-[11px] text-slate-500",
-											children: "Updater agent package"
-										})] })]
+										className: "flex items-center justify-between mb-5",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "flex items-center gap-3",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+												className: "w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center",
+												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconRefresh, { className: "w-5 h-5 text-violet-600" })
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+												className: "text-sm font-bold text-slate-900",
+												children: "FOTA Updater"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+												className: "text-[11px] text-slate-500",
+												children: "Updater agent package"
+											})] })]
+										}), isFotaTrackActive ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+											className: "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" }), "Pending Update"]
+										}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+											className: "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-emerald-500" }), "Success by default"]
+										})]
 									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "space-y-4 flex-1",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "grid grid-cols-[1fr_auto_1fr] gap-2 items-end",
-											children: [
-												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-													className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
-													children: "Current"
-												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-													className: `h-10 px-3 flex items-center rounded-lg border text-sm font-mono font-medium ${isFotaDetailsFetching ? "bg-violet-50/50 border-violet-100 text-violet-400 animate-pulse" : "bg-slate-50 border-slate-200 text-slate-600"}`,
-													children: isFotaDetailsFetching ? "Loading..." : fotaForm.fota_old_version || "—"
-												})] }),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-													className: "pb-2.5 text-slate-300",
-													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconArrow, { className: "w-4 h-4" })
-												}),
-												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-													className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
-													children: "New"
-												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
-													type: "text",
-													value: fotaForm.fota_new_version,
-													onChange: (e) => handleVersionChange("fota_new_version", e.target.value),
-													disabled: !fotaForm.device_id,
-													placeholder: "v1.0.0",
-													className: "h-10 px-3 w-full bg-white border border-slate-200 rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
-												})] })
-											]
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-											className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
-											children: "Package Archive"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileUploadZone, {
-											file: fotaZipFile,
-											onFileChange: handleFileChange(setFotaZipFile),
-											disabled: !fotaForm.device_id,
-											label: "fota",
-											dragActive: dragActiveZone === "fota",
-											onDrag: (active) => setDragActiveZone(active ? "fota" : null)
-										})] })]
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "grid grid-cols-[1fr_auto_1fr] gap-2 items-end",
+												children: [
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+														className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
+														children: "Current"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+														className: `h-10 px-3 flex items-center rounded-lg border text-sm font-mono font-medium ${isFotaDetailsFetching ? "bg-violet-50/50 border-violet-100 text-violet-400 animate-pulse" : "bg-slate-50 border-slate-200 text-slate-600"}`,
+														children: isFotaDetailsFetching ? "Loading..." : fotaForm.fota_old_version || "0.0.0"
+													})] }),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+														className: "pb-2.5 text-slate-300",
+														children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconArrow, { className: "w-4 h-4" })
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+														className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
+														children: "New"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+														type: "text",
+														value: fotaForm.fota_new_version,
+														onChange: (e) => handleVersionChange("fota_new_version", e.target.value),
+														disabled: !fotaForm.device_id,
+														placeholder: "e.g. 1.0.0 or v1.0.0",
+														className: `h-10 px-3 w-full bg-white border rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none transition-all disabled:bg-slate-50 disabled:cursor-not-allowed ${fotaForm.fota_new_version ? fotaValidation.isValid && fotaValidation.isGreater ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 bg-emerald-50/20" : "border-rose-400 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20" : "border-slate-200 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"}`
+													})] })
+												]
+											}),
+											fotaForm.fota_new_version && !fotaValidation.isValid && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+												className: "text-rose-600 text-xs font-medium flex items-center gap-1.5",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconAlertCircle, { className: "w-3.5 h-3.5 shrink-0 text-rose-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: fotaValidation.error })]
+											}),
+											fotaForm.fota_new_version && fotaValidation.isValid && fotaValidation.isGreater && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+												className: "text-emerald-600 text-xs font-medium flex items-center gap-1.5",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconCheck, { className: "w-3.5 h-3.5 shrink-0 text-emerald-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+													"Valid upgrade: ",
+													fotaForm.fota_old_version || "0.0.0",
+													" → ",
+													fotaForm.fota_new_version
+												] })]
+											}),
+											!fotaForm.fota_new_version && fotaZipFile && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+												className: "text-amber-600 text-xs font-medium flex items-center gap-1.5",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconAlertCircle, { className: "w-3.5 h-3.5 shrink-0 text-amber-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Package archive attached — enter a greater target version" })]
+											}),
+											fotaForm.device_id > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex flex-wrap items-center gap-1.5 pt-1",
+												children: [
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-[10px] uppercase font-bold text-slate-400 mr-1",
+														children: "Quick Bump:"
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+														type: "button",
+														onClick: () => handleVersionChange("fota_new_version", bumpVersion(fotaForm.fota_old_version, "patch")),
+														className: "text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-violet-50 hover:text-violet-600 text-slate-600 transition-colors border border-slate-200",
+														children: [
+															"+Patch (",
+															bumpVersion(fotaForm.fota_old_version, "patch"),
+															")"
+														]
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+														type: "button",
+														onClick: () => handleVersionChange("fota_new_version", bumpVersion(fotaForm.fota_old_version, "minor")),
+														className: "text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-violet-50 hover:text-violet-600 text-slate-600 transition-colors border border-slate-200",
+														children: [
+															"+Minor (",
+															bumpVersion(fotaForm.fota_old_version, "minor"),
+															")"
+														]
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+														type: "button",
+														onClick: () => handleVersionChange("fota_new_version", bumpVersion(fotaForm.fota_old_version, "major")),
+														className: "text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-violet-50 hover:text-violet-600 text-slate-600 transition-colors border border-slate-200",
+														children: [
+															"+Major (",
+															bumpVersion(fotaForm.fota_old_version, "major"),
+															")"
+														]
+													})
+												]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+												className: "block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5",
+												children: "Package Archive"
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileUploadZone, {
+												file: fotaZipFile,
+												onFileChange: handleFileChange(setFotaZipFile),
+												disabled: !fotaForm.device_id,
+												label: "fota",
+												dragActive: dragActiveZone === "fota",
+												onDrag: (active) => setDragActiveZone(active ? "fota" : null)
+											})] })
+										]
 									})]
 								})]
 							})

@@ -4,9 +4,9 @@ import { c as HeadContent, d as createRouter, f as Outlet, h as createRootRoute,
 import { t as QueryClient } from "../_libs/tanstack__query-core.mjs";
 import { r as QueryClientProvider } from "../_libs/tanstack__react-query.mjs";
 import { t as Toaster } from "../_libs/sonner.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/router-4H5DYtrv.js
+//#region node_modules/.nitro/vite/services/ssr/assets/router-Dxy4WZsn.js
 var import_jsx_runtime = require_jsx_runtime();
-var styles_default = "/assets/styles-CaziHlbO.css";
+var styles_default = "/assets/styles-C0gH1ugx.css";
 var client = new QueryClient();
 var Route$8 = createRootRoute({
 	head: () => ({
@@ -42,15 +42,15 @@ var $$splitComponentImporter$7 = () => import("./login-DfgiOlVT.mjs");
 var Route$7 = createFileRoute("/login")({ component: lazyRouteComponent($$splitComponentImporter$7, "component") });
 var $$splitComponentImporter$6 = () => import("../_layout-BW27Igzr.mjs");
 var Route$6 = createFileRoute("/_layout")({ component: lazyRouteComponent($$splitComponentImporter$6, "component") });
-var $$splitComponentImporter$5 = () => import("./routes-Rs-f0vzE.mjs");
+var $$splitComponentImporter$5 = () => import("./routes-DMYSpJfz.mjs");
 var Route$5 = createFileRoute("/")({ component: lazyRouteComponent($$splitComponentImporter$5, "component") });
 var $$splitComponentImporter$4 = () => import("./updates-gA4-A33Y.mjs");
 var Route$4 = createFileRoute("/_layout/updates/")({ component: lazyRouteComponent($$splitComponentImporter$4, "component") });
 var $$splitComponentImporter$3 = () => import("./settings-BBKU9IfK.mjs");
 var Route$3 = createFileRoute("/_layout/settings/")({ component: lazyRouteComponent($$splitComponentImporter$3, "component") });
-var $$splitComponentImporter$2 = () => import("./dashboard-CMMf2Wg7.mjs");
+var $$splitComponentImporter$2 = () => import("./dashboard-QN2y36uv.mjs");
 var Route$2 = createFileRoute("/_layout/dashboard/")({ component: lazyRouteComponent($$splitComponentImporter$2, "component") });
-var $$splitComponentImporter$1 = () => import("./fota-information-CD7h0Fb2.mjs");
+var $$splitComponentImporter$1 = () => import("./fota-information-BVvntHLr.mjs");
 var Route$1 = createFileRoute("/$deviceId/fota-information/")({ component: lazyRouteComponent($$splitComponentImporter$1, "component") });
 var $$splitComponentImporter = () => import("./info-Cn5H3y1b.mjs");
 var Route = createFileRoute("/devices/$id/info/")({ component: lazyRouteComponent($$splitComponentImporter, "component") });

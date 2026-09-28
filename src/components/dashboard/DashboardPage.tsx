@@ -9,6 +9,23 @@ import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "@tanstack/react-router";
+import { validateVersion, bumpVersion } from "@/lib/versionUtils";
+
+const IconAlertCircle = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+    />
+  </svg>
+);
 
 /* ─────────────────────────── Types ─────────────────────────── */
 
@@ -350,8 +367,8 @@ function TrackStatusPill({
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-      <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
       {typeof value === "string" && value ? value : "Pending"}
     </span>
   );
@@ -569,15 +586,53 @@ export default function DashboardPage() {
     (fotaDetailsData as any)?.fotaDetails ?? null;
 
   useEffect(() => {
-    if (!latestFotaRecord) return;
+    if (!latestFotaRecord) {
+      if (selectedDevice) {
+        setFotaForm((prev) => ({
+          ...prev,
+          device_old_version:
+            selectedDevice.firmwareVersion ||
+            selectedDevice.deviceVersion ||
+            "0.0.0",
+          web_old_version: (selectedDevice as any)?.web_version || "0.0.0",
+          fota_old_version: "0.0.0",
+        }));
+      }
+      return;
+    }
+
+    const deviceCurrent =
+      (latestFotaRecord.deviceStatus === 1
+        ? latestFotaRecord.deviceNewVersion
+        : null) ||
+      latestFotaRecord.deviceOldVersion ||
+      selectedDevice?.firmwareVersion ||
+      selectedDevice?.deviceVersion ||
+      "0.0.0";
+
+    const webCurrent =
+      (latestFotaRecord.webStatus === 1
+        ? latestFotaRecord.webNewVersion
+        : null) ||
+      latestFotaRecord.webOldVersion ||
+      (selectedDevice as any)?.web_version ||
+      "0.0.0";
+
+    const fotaCurrent =
+      (latestFotaRecord.fotaStatus === "APPLIED" ||
+      latestFotaRecord.fotaStatus === "SUCCESS"
+        ? latestFotaRecord.fotaNewVersion
+        : null) ||
+      latestFotaRecord.fotaOldVersion ||
+      "0.0.0";
+
     setFotaForm((prev) => ({
       ...prev,
-      device_old_version:
-        latestFotaRecord.deviceNewVersion ?? latestFotaRecord.deviceOldVersion ?? "",
-      web_old_version: latestFotaRecord.webNewVersion ?? latestFotaRecord.webOldVersion ?? "",
-      fota_old_version: latestFotaRecord.fotaNewVersion ?? latestFotaRecord.fotaOldVersion ?? "",
+      device_old_version: deviceCurrent,
+      web_old_version: webCurrent,
+      fota_old_version: fotaCurrent,
     }));
-  }, [latestFotaRecord]);
+  }, [latestFotaRecord, selectedDevice]);
 
   useEffect(() => {
     if (!isFotaDetailsError || fotaForm.device_id === 0) return;
@@ -603,13 +658,66 @@ export default function DashboardPage() {
     [devicesList, fotaForm.device_id],
   );
 
-  const hasAnyNewVersion = Boolean(
-    fotaForm.device_new_version ||
-    fotaForm.web_new_version ||
-    fotaForm.fota_new_version,
+  const isDeviceTrackActive = Boolean(
+    fotaForm.device_new_version || deviceZipFile,
   );
-  const hasAnyFile = Boolean(deviceZipFile || webZipFile || fotaZipFile);
-  let canSubmit = fotaForm.device_id > 0 && (hasAnyNewVersion || hasAnyFile);
+  const isWebTrackActive = Boolean(
+    fotaForm.web_new_version || webZipFile,
+  );
+  const isFotaTrackActive = Boolean(
+    fotaForm.fota_new_version || fotaZipFile,
+  );
+  const hasAnyTrackActive =
+    isDeviceTrackActive || isWebTrackActive || isFotaTrackActive;
+
+  const deviceValidation = useMemo(
+    () =>
+      validateVersion(
+        fotaForm.device_new_version,
+        fotaForm.device_old_version,
+      ),
+    [fotaForm.device_new_version, fotaForm.device_old_version],
+  );
+
+  const webValidation = useMemo(
+    () =>
+      validateVersion(fotaForm.web_new_version, fotaForm.web_old_version),
+    [fotaForm.web_new_version, fotaForm.web_old_version],
+  );
+
+  const fotaValidation = useMemo(
+    () =>
+      validateVersion(
+        fotaForm.fota_new_version,
+        fotaForm.fota_old_version,
+      ),
+    [fotaForm.fota_new_version, fotaForm.fota_old_version],
+  );
+
+  const canSubmit = useMemo(() => {
+    if (!fotaForm.device_id || !hasAnyTrackActive) return false;
+
+    if (isDeviceTrackActive) {
+      if (!deviceValidation.isValid || !deviceValidation.isGreater) return false;
+    }
+    if (isWebTrackActive) {
+      if (!webValidation.isValid || !webValidation.isGreater) return false;
+    }
+    if (isFotaTrackActive) {
+      if (!fotaValidation.isValid || !fotaValidation.isGreater) return false;
+    }
+
+    return true;
+  }, [
+    fotaForm.device_id,
+    hasAnyTrackActive,
+    isDeviceTrackActive,
+    deviceValidation,
+    isWebTrackActive,
+    webValidation,
+    isFotaTrackActive,
+    fotaValidation,
+  ]);
 
   /* ── Handlers ── */
   const handleServerChange = (serverId: number) => {
@@ -652,14 +760,7 @@ export default function DashboardPage() {
   };
 
   const handleVersionChange = (field: keyof FotaTextFields, value: string) => {
-    if (
-      fotaForm.device_old_version == value ||
-      fotaForm.web_old_version == value
-    ) {
-      canSubmit = false;
-    } else {
-      setFotaForm((prev) => ({ ...prev, [field]: value }));
-    }
+    setFotaForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleFileChange =
@@ -684,8 +785,21 @@ export default function DashboardPage() {
       toast.error("Please select a device first");
       return;
     }
-    if (!hasAnyNewVersion && !hasAnyFile) {
+    if (!hasAnyTrackActive) {
       toast.error("Please provide at least one new version or upload a file");
+      return;
+    }
+
+    if (isDeviceTrackActive && (!deviceValidation.isValid || !deviceValidation.isGreater)) {
+      toast.error(deviceValidation.error || "Device new version is invalid or not greater than current version");
+      return;
+    }
+    if (isWebTrackActive && (!webValidation.isValid || !webValidation.isGreater)) {
+      toast.error(webValidation.error || "Web new version is invalid or not greater than current version");
+      return;
+    }
+    if (isFotaTrackActive && (!fotaValidation.isValid || !fotaValidation.isGreater)) {
+      toast.error(fotaValidation.error || "FOTA new version is invalid or not greater than current version");
       return;
     }
 
@@ -723,8 +837,13 @@ export default function DashboardPage() {
       setDeviceZipFile(null);
       setWebZipFile(null);
       setFotaZipFile(null);
-    } catch (err) {
-      toast.error("Failed to deploy FOTA update");
+    } catch (err: any) {
+      const errMsg =
+        err?.response?.data?.error ||
+        err?.data?.error ||
+        err?.message ||
+        "Failed to deploy FOTA update";
+      toast.error(errMsg);
     }
   };
 
@@ -964,18 +1083,31 @@ export default function DashboardPage() {
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
             <div className="h-1 bg-indigo-500" />
             <div className="p-5 flex-1 flex flex-col">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
-                  <IconChip className="w-5 h-5 text-indigo-600" />
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
+                    <IconChip className="w-5 h-5 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900">
+                      Device Firmware
+                    </h3>
+                    <p className="text-[11px] text-slate-500">
+                      Core system package
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900">
-                    Device Firmware
-                  </h3>
-                  <p className="text-[11px] text-slate-500">
-                    Core system package
-                  </p>
-                </div>
+                {isDeviceTrackActive ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    Pending Update
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    Success by default
+                  </span>
+                )}
               </div>
 
               <div className="space-y-4 flex-1">
@@ -994,7 +1126,7 @@ export default function DashboardPage() {
                     >
                       {isFotaDetailsFetching
                         ? "Loading..."
-                        : fotaForm.device_old_version || "—"}
+                        : fotaForm.device_old_version || "0.0.0"}
                     </div>
                   </div>
                   <div className="pb-2.5 text-slate-300">
@@ -1014,19 +1146,84 @@ export default function DashboardPage() {
                         )
                       }
                       disabled={!fotaForm.device_id}
-                      placeholder="v1.2.0"
-                      className="h-10 px-3 w-full bg-white border border-slate-200 rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
+                      placeholder="e.g. 1.2.0 or v1.2.0"
+                      className={`h-10 px-3 w-full bg-white border rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none transition-all disabled:bg-slate-50 disabled:cursor-not-allowed ${
+                        fotaForm.device_new_version
+                          ? deviceValidation.isValid && deviceValidation.isGreater
+                            ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 bg-emerald-50/20"
+                            : "border-rose-400 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20"
+                          : "border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      }`}
                     />
-
-                    {fotaForm.device_new_version &&
-                    fotaForm.device_old_version ==
-                      fotaForm.device_new_version ? (
-                      <p className="text-red-600 text-sm font-mono font-medium">
-                        New version cannot be the same as the old version.
-                      </p>
-                    ) : null}
                   </div>
                 </div>
+
+                {/* Validation messages */}
+                {fotaForm.device_new_version && !deviceValidation.isValid && (
+                  <p className="text-rose-600 text-xs font-medium flex items-center gap-1.5">
+                    <IconAlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-500" />
+                    <span>{deviceValidation.error}</span>
+                  </p>
+                )}
+                {fotaForm.device_new_version && deviceValidation.isValid && deviceValidation.isGreater && (
+                  <p className="text-emerald-600 text-xs font-medium flex items-center gap-1.5">
+                    <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
+                    <span>
+                      Valid upgrade: {fotaForm.device_old_version || "0.0.0"} → {fotaForm.device_new_version}
+                    </span>
+                  </p>
+                )}
+                {!fotaForm.device_new_version && deviceZipFile && (
+                  <p className="text-amber-600 text-xs font-medium flex items-center gap-1.5">
+                    <IconAlertCircle className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+                    <span>Package archive attached — enter a greater target version</span>
+                  </p>
+                )}
+
+                {/* Quick Bump Helpers */}
+                {fotaForm.device_id > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 mr-1">
+                      Quick Bump:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleVersionChange(
+                          "device_new_version",
+                          bumpVersion(fotaForm.device_old_version, "patch"),
+                        )
+                      }
+                      className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200"
+                    >
+                      +Patch ({bumpVersion(fotaForm.device_old_version, "patch")})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleVersionChange(
+                          "device_new_version",
+                          bumpVersion(fotaForm.device_old_version, "minor"),
+                        )
+                      }
+                      className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200"
+                    >
+                      +Minor ({bumpVersion(fotaForm.device_old_version, "minor")})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleVersionChange(
+                          "device_new_version",
+                          bumpVersion(fotaForm.device_old_version, "major"),
+                        )
+                      }
+                      className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200"
+                    >
+                      +Major ({bumpVersion(fotaForm.device_old_version, "major")})
+                    </button>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
@@ -1051,16 +1248,29 @@ export default function DashboardPage() {
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
             <div className="h-1 bg-sky-500" />
             <div className="p-5 flex-1 flex flex-col">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 bg-sky-50 rounded-xl flex items-center justify-center">
-                  <IconGlobe className="w-5 h-5 text-sky-600" />
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-sky-50 rounded-xl flex items-center justify-center">
+                    <IconGlobe className="w-5 h-5 text-sky-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900">
+                      Web Application
+                    </h3>
+                    <p className="text-[11px] text-slate-500">Frontend bundle</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900">
-                    Web Application
-                  </h3>
-                  <p className="text-[11px] text-slate-500">Frontend bundle</p>
-                </div>
+                {isWebTrackActive ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    Pending Update
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    Success by default
+                  </span>
+                )}
               </div>
 
               <div className="space-y-4 flex-1">
@@ -1078,7 +1288,7 @@ export default function DashboardPage() {
                     >
                       {isFotaDetailsFetching
                         ? "Loading..."
-                        : fotaForm.web_old_version || "—"}
+                        : fotaForm.web_old_version || "0.0.0"}
                     </div>
                   </div>
                   <div className="pb-2.5 text-slate-300">
@@ -1095,17 +1305,84 @@ export default function DashboardPage() {
                         handleVersionChange("web_new_version", e.target.value)
                       }
                       disabled={!fotaForm.device_id}
-                      placeholder="v2.0.0"
-                      className="h-10 px-3 w-full bg-white border border-slate-200 rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
+                      placeholder="e.g. 2.0.0 or v2.0.0"
+                      className={`h-10 px-3 w-full bg-white border rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none transition-all disabled:bg-slate-50 disabled:cursor-not-allowed ${
+                        fotaForm.web_new_version
+                          ? webValidation.isValid && webValidation.isGreater
+                            ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 bg-emerald-50/20"
+                            : "border-rose-400 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20"
+                          : "border-slate-200 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                      }`}
                     />
-                    {fotaForm.web_new_version &&
-                    fotaForm.web_old_version == fotaForm.web_new_version ? (
-                      <p className="text-red-600 text-sm font-mono font-medium">
-                        New version cannot be the same as the old version.
-                      </p>
-                    ) : null}
                   </div>
                 </div>
+
+                {/* Validation messages */}
+                {fotaForm.web_new_version && !webValidation.isValid && (
+                  <p className="text-rose-600 text-xs font-medium flex items-center gap-1.5">
+                    <IconAlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-500" />
+                    <span>{webValidation.error}</span>
+                  </p>
+                )}
+                {fotaForm.web_new_version && webValidation.isValid && webValidation.isGreater && (
+                  <p className="text-emerald-600 text-xs font-medium flex items-center gap-1.5">
+                    <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
+                    <span>
+                      Valid upgrade: {fotaForm.web_old_version || "0.0.0"} → {fotaForm.web_new_version}
+                    </span>
+                  </p>
+                )}
+                {!fotaForm.web_new_version && webZipFile && (
+                  <p className="text-amber-600 text-xs font-medium flex items-center gap-1.5">
+                    <IconAlertCircle className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+                    <span>Package archive attached — enter a greater target version</span>
+                  </p>
+                )}
+
+                {/* Quick Bump Helpers */}
+                {fotaForm.device_id > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 mr-1">
+                      Quick Bump:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleVersionChange(
+                          "web_new_version",
+                          bumpVersion(fotaForm.web_old_version, "patch"),
+                        )
+                      }
+                      className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-sky-50 hover:text-sky-600 text-slate-600 transition-colors border border-slate-200"
+                    >
+                      +Patch ({bumpVersion(fotaForm.web_old_version, "patch")})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleVersionChange(
+                          "web_new_version",
+                          bumpVersion(fotaForm.web_old_version, "minor"),
+                        )
+                      }
+                      className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-sky-50 hover:text-sky-600 text-slate-600 transition-colors border border-slate-200"
+                    >
+                      +Minor ({bumpVersion(fotaForm.web_old_version, "minor")})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleVersionChange(
+                          "web_new_version",
+                          bumpVersion(fotaForm.web_old_version, "major"),
+                        )
+                      }
+                      className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-sky-50 hover:text-sky-600 text-slate-600 transition-colors border border-slate-200"
+                    >
+                      +Major ({bumpVersion(fotaForm.web_old_version, "major")})
+                    </button>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
@@ -1130,18 +1407,31 @@ export default function DashboardPage() {
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
             <div className="h-1 bg-violet-500" />
             <div className="p-5 flex-1 flex flex-col">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center">
-                  <IconRefresh className="w-5 h-5 text-violet-600" />
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center">
+                    <IconRefresh className="w-5 h-5 text-violet-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900">
+                      FOTA Updater
+                    </h3>
+                    <p className="text-[11px] text-slate-500">
+                      Updater agent package
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900">
-                    FOTA Updater
-                  </h3>
-                  <p className="text-[11px] text-slate-500">
-                    Updater agent package
-                  </p>
-                </div>
+                {isFotaTrackActive ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    Pending Update
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    Success by default
+                  </span>
+                )}
               </div>
 
               <div className="space-y-4 flex-1">
@@ -1159,7 +1449,7 @@ export default function DashboardPage() {
                     >
                       {isFotaDetailsFetching
                         ? "Loading..."
-                        : fotaForm.fota_old_version || "—"}
+                        : fotaForm.fota_old_version || "0.0.0"}
                     </div>
                   </div>
                   <div className="pb-2.5 text-slate-300">
@@ -1176,11 +1466,84 @@ export default function DashboardPage() {
                         handleVersionChange("fota_new_version", e.target.value)
                       }
                       disabled={!fotaForm.device_id}
-                      placeholder="v1.0.0"
-                      className="h-10 px-3 w-full bg-white border border-slate-200 rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all disabled:bg-slate-50 disabled:cursor-not-allowed"
+                      placeholder="e.g. 1.0.0 or v1.0.0"
+                      className={`h-10 px-3 w-full bg-white border rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none transition-all disabled:bg-slate-50 disabled:cursor-not-allowed ${
+                        fotaForm.fota_new_version
+                          ? fotaValidation.isValid && fotaValidation.isGreater
+                            ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 bg-emerald-50/20"
+                            : "border-rose-400 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20"
+                          : "border-slate-200 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+                      }`}
                     />
                   </div>
                 </div>
+
+                {/* Validation messages */}
+                {fotaForm.fota_new_version && !fotaValidation.isValid && (
+                  <p className="text-rose-600 text-xs font-medium flex items-center gap-1.5">
+                    <IconAlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-500" />
+                    <span>{fotaValidation.error}</span>
+                  </p>
+                )}
+                {fotaForm.fota_new_version && fotaValidation.isValid && fotaValidation.isGreater && (
+                  <p className="text-emerald-600 text-xs font-medium flex items-center gap-1.5">
+                    <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
+                    <span>
+                      Valid upgrade: {fotaForm.fota_old_version || "0.0.0"} → {fotaForm.fota_new_version}
+                    </span>
+                  </p>
+                )}
+                {!fotaForm.fota_new_version && fotaZipFile && (
+                  <p className="text-amber-600 text-xs font-medium flex items-center gap-1.5">
+                    <IconAlertCircle className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+                    <span>Package archive attached — enter a greater target version</span>
+                  </p>
+                )}
+
+                {/* Quick Bump Helpers */}
+                {fotaForm.device_id > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 mr-1">
+                      Quick Bump:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleVersionChange(
+                          "fota_new_version",
+                          bumpVersion(fotaForm.fota_old_version, "patch"),
+                        )
+                      }
+                      className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-violet-50 hover:text-violet-600 text-slate-600 transition-colors border border-slate-200"
+                    >
+                      +Patch ({bumpVersion(fotaForm.fota_old_version, "patch")})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleVersionChange(
+                          "fota_new_version",
+                          bumpVersion(fotaForm.fota_old_version, "minor"),
+                        )
+                      }
+                      className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-violet-50 hover:text-violet-600 text-slate-600 transition-colors border border-slate-200"
+                    >
+                      +Minor ({bumpVersion(fotaForm.fota_old_version, "minor")})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleVersionChange(
+                          "fota_new_version",
+                          bumpVersion(fotaForm.fota_old_version, "major"),
+                        )
+                      }
+                      className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-violet-50 hover:text-violet-600 text-slate-600 transition-colors border border-slate-200"
+                    >
+                      +Major ({bumpVersion(fotaForm.fota_old_version, "major")})
+                    </button>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
