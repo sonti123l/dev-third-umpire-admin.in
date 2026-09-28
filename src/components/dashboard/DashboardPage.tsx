@@ -670,6 +670,16 @@ export default function DashboardPage() {
   const hasAnyTrackActive =
     isDeviceTrackActive || isWebTrackActive || isFotaTrackActive;
 
+  const hasAnyNewVersion = Boolean(
+    fotaForm.device_new_version ||
+    fotaForm.web_new_version ||
+    fotaForm.fota_new_version,
+  );
+
+  const hasAnyFile = Boolean(
+    deviceZipFile || webZipFile || fotaZipFile,
+  );
+
   const deviceValidation = useMemo(
     () =>
       validateVersion(

@@ -5,7 +5,7 @@ import { g as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
 import { n as getDevicesDetails, r as getFotaDetailsForDevice, t as AddDetailsIntoFotaDb } from "./dashboardService-DFj4idLN.mjs";
 import { n as useQuery, t as useMutation } from "../_libs/tanstack__react-query.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/DashboardPage-cKBHEaH8.js
+//#region node_modules/.nitro/vite/services/ssr/assets/DashboardPage-RqjSndWW.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 /**
@@ -523,6 +523,8 @@ function DashboardPage() {
 	const isWebTrackActive = Boolean(fotaForm.web_new_version || webZipFile);
 	const isFotaTrackActive = Boolean(fotaForm.fota_new_version || fotaZipFile);
 	const hasAnyTrackActive = isDeviceTrackActive || isWebTrackActive || isFotaTrackActive;
+	const hasAnyNewVersion = Boolean(fotaForm.device_new_version || fotaForm.web_new_version || fotaForm.fota_new_version);
+	const hasAnyFile = Boolean(deviceZipFile || webZipFile || fotaZipFile);
 	const deviceValidation = (0, import_react.useMemo)(() => validateVersion(fotaForm.device_new_version, fotaForm.device_old_version), [fotaForm.device_new_version, fotaForm.device_old_version]);
 	const webValidation = (0, import_react.useMemo)(() => validateVersion(fotaForm.web_new_version, fotaForm.web_old_version), [fotaForm.web_new_version, fotaForm.web_old_version]);
 	const fotaValidation = (0, import_react.useMemo)(() => validateVersion(fotaForm.fota_new_version, fotaForm.fota_old_version), [fotaForm.fota_new_version, fotaForm.fota_old_version]);
