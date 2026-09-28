@@ -34,6 +34,8 @@ export interface pageProps {
   noDataLabel?: string;
   page?: Number;
   page_size?: Number;
+  stickyFirstColumn?: boolean;
+  stickyLastColumn?: boolean;
 }
 
 export interface iConfirmDialog {

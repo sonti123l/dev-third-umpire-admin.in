@@ -4,9 +4,9 @@ import { c as HeadContent, d as createRouter, f as Outlet, h as createRootRoute,
 import { t as QueryClient } from "../_libs/tanstack__query-core.mjs";
 import { r as QueryClientProvider } from "../_libs/tanstack__react-query.mjs";
 import { t as Toaster } from "../_libs/sonner.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/router-DK5LmDMe.js
+//#region node_modules/.nitro/vite/services/ssr/assets/router-GU0e7IGQ.js
 var import_jsx_runtime = require_jsx_runtime();
-var styles_default = "/assets/styles-C0gH1ugx.css";
+var styles_default = "/assets/styles-CMrtaQ2k.css";
 var client = new QueryClient();
 var Route$8 = createRootRoute({
 	head: () => ({
@@ -50,7 +50,7 @@ var $$splitComponentImporter$3 = () => import("./settings-BBKU9IfK.mjs");
 var Route$3 = createFileRoute("/_layout/settings/")({ component: lazyRouteComponent($$splitComponentImporter$3, "component") });
 var $$splitComponentImporter$2 = () => import("./dashboard-F3SwBPx_.mjs");
 var Route$2 = createFileRoute("/_layout/dashboard/")({ component: lazyRouteComponent($$splitComponentImporter$2, "component") });
-var $$splitComponentImporter$1 = () => import("./fota-information-BVvntHLr.mjs");
+var $$splitComponentImporter$1 = () => import("./fota-information-Dto4AQXa.mjs");
 var Route$1 = createFileRoute("/$deviceId/fota-information/")({ component: lazyRouteComponent($$splitComponentImporter$1, "component") });
 var $$splitComponentImporter = () => import("./info-Cn5H3y1b.mjs");
 var Route = createFileRoute("/devices/$id/info/")({ component: lazyRouteComponent($$splitComponentImporter, "component") });

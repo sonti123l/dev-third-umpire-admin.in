@@ -36,6 +36,8 @@ const TanStackTable: FC<pageProps> = ({
   noDataLabel,
   page,
   page_size,
+  stickyFirstColumn = true,
+  stickyLastColumn = true,
 }) => {
   const router = useRouter();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -75,8 +77,14 @@ const TanStackTable: FC<pageProps> = ({
   };
 
   const getWidth = (id: string) => {
-    const widthObj = columns.find((col) => col.id === id);
-    return widthObj ? widthObj?.width || widthObj?.size || "100px" : "100px";
+    const widthObj = columns.find(
+      (col) => col.id === id || (col as any).accessorKey === id,
+    );
+    if (!widthObj) return "130px";
+    const size = (widthObj as any).width || (widthObj as any).size;
+    if (typeof size === "number") return `${size}px`;
+    if (typeof size === "string") return size;
+    return "130px";
   };
 
   const sortAndGetData = (header: any) => {
@@ -109,139 +117,195 @@ const TanStackTable: FC<pageProps> = ({
   };
 
   return (
-    <div className="scrollbar overflow-x-auto  w-full ">
+    <div className="w-full">
       <div
-        className={` overflow-auto scrollbar w-full relative  ease-in-out duration-300 transition-all ${heightClass ? heightClass : "h-auto"} [&>*:first-child]:h-full`}
+        className={`w-full overflow-x-auto scrollbar relative ${
+          heightClass ? heightClass : "h-auto"
+        }`}
       >
         {!data?.length && !loading ? (
-          <div className="flex h-full mt-[5%] justify-center items-center overflow-hidden">
-            <p className="text-[20px] flex items-center h-full text-[#333] font-[400]">
+          <div className="flex min-h-[200px] justify-center items-center p-8">
+            <p className="text-sm font-medium text-slate-500">
               {noDataLabel ? noDataLabel : "No data available"}
             </p>
           </div>
         ) : (
-          <div className="max-h-[calc(100vh-180px)]">
-            <Table className="relative">
-              <TableHeader className="sticky top-[0px] z-[1]  border-r-0">
+          <div className="max-h-[calc(100vh-220px)] overflow-y-auto">
+            <table className="w-full caption-bottom text-sm border-separate border-spacing-0 relative">
+              <thead className="sticky top-0 z-30 shadow-sm">
                 {table?.getHeaderGroups()?.map((headerGroup) => (
-                  <TableRow key={headerGroup.id + `-${new Date().getTime()}`}>
+                  <tr key={headerGroup.id}>
                     {headerGroup.headers.map(
                       (header: Header<any, unknown>, index: number) => {
+                        const isFirst = stickyFirstColumn && index === 0;
+                        const isLast =
+                          stickyLastColumn &&
+                          index === headerGroup.headers.length - 1;
+                        const colWidth = getWidth(header.id);
+
                         return (
-                          <TableHead
-                            key={index + `-${new Date().getTime()}`}
+                          <th
+                            key={header.id}
                             colSpan={header.colSpan}
-                            className="bg-black"
+                            className={`bg-slate-900 text-white font-semibold text-xs tracking-wider uppercase text-left px-3.5 py-3 border-b border-slate-800 whitespace-nowrap select-none ${
+                              isFirst
+                                ? "sticky left-0 z-40 border-r border-slate-700 shadow-[4px_0_8px_-2px_rgba(0,0,0,0.35)]"
+                                : ""
+                            } ${
+                              isLast
+                                ? "sticky right-0 z-40 border-l border-slate-700 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.35)]"
+                                : ""
+                            }`}
                             style={{
-                              minWidth: getWidth(header.id),
-                              width: getWidth(header.id),
-                              color: "#fff",
-                              fontWeight: "500",
+                              minWidth: colWidth,
+                              width: colWidth,
+                              maxWidth: isFirst || isLast ? colWidth : undefined,
+                              ...(isFirst ? { left: 0 } : {}),
+                              ...(isLast ? { right: 0 } : {}),
                             }}
                           >
                             {header.isPlaceholder ? null : (
                               <div
-                                className={`flex items-center gap-1 ${
+                                className={`flex items-center gap-1.5 ${
                                   header.column.getCanSort()
-                                    ? "cursor-pointer select-none"
+                                    ? "cursor-pointer select-none hover:text-indigo-300 transition-colors"
                                     : ""
                                 }`}
                                 onClick={() => sortAndGetData(header)}
-                                style={{
-                                  minWidth: getWidth(header.id),
-                                  width: getWidth(header.id),
-                                }}
                               >
                                 {flexRender(
                                   header.column.columnDef.header,
-                                  header.getContext()
+                                  header.getContext(),
                                 )}
-
-                                {/* <SortItems
-                                  header={header}
-                                  removeSortingForColumnIds={
-                                    removeSortingForColumnIds
-                                  }
-                                /> */}
                               </div>
                             )}
-                          </TableHead>
+                          </th>
                         );
-                      }
+                      },
                     )}
-                  </TableRow>
+                  </tr>
                 ))}
-              </TableHeader>
+              </thead>
 
-              <TableBody className="border-x">
+              <tbody className="divide-y divide-slate-100">
                 {data?.length ? (
-                  table?.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id + `-${new Date().getTime()}`}
-                      className="border-b-0 hover:bg-gray-300 even:bg-gray-100 transition-colors duration-200 "
-                      {...((row?.original.issue_id as any) &&
-                      row?.id &&
-                      !row?.original.service_type
-                        ? {
-                            onClick: () =>
-                              router.navigate({
-                                to: `/devices/${row.original.id}/info`,
-                              }),
-                          }
-                        : {})}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell
-                          className="p-2 !bg-transparent"
-                          key={cell.id + `-${new Date().getTime()}`}
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
+                  table.getRowModel().rows.map((row, rowIndex) => {
+                    const rowBg =
+                      rowIndex % 2 === 0 ? "bg-white" : "bg-slate-50/60";
+                    return (
+                      <tr
+                        key={row.id}
+                        className={`group ${rowBg} hover:bg-indigo-50/40 transition-colors duration-150 ${
+                          (row?.original as any)?.issue_id &&
+                          row?.id &&
+                          !(row?.original as any)?.service_type
+                            ? "cursor-pointer"
+                            : ""
+                        }`}
+                        {...((row?.original as any)?.issue_id &&
+                        row?.id &&
+                        !(row?.original as any)?.service_type
+                          ? {
+                              onClick: () =>
+                                router.navigate({
+                                  to: `/devices/${(row.original as any).id}/info`,
+                                }),
+                            }
+                          : {})}
+                      >
+                        {row.getVisibleCells().map((cell, cellIndex) => {
+                          const isFirst = stickyFirstColumn && cellIndex === 0;
+                          const isLast =
+                            stickyLastColumn &&
+                            cellIndex === row.getVisibleCells().length - 1;
+                          const colWidth = getWidth(cell.column.id);
+
+                          return (
+                            <td
+                              key={cell.id}
+                              className={`px-3.5 py-2.5 text-sm align-middle whitespace-nowrap border-b border-slate-100 ${
+                                isFirst
+                                  ? `sticky left-0 z-20 ${rowBg} group-hover:bg-[#f1f5f9] border-r border-slate-200 shadow-[4px_0_8px_-2px_rgba(0,0,0,0.06)]`
+                                  : ""
+                              } ${
+                                isLast
+                                  ? `sticky right-0 z-20 ${rowBg} group-hover:bg-[#f1f5f9] border-l border-slate-200 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.06)]`
+                                  : ""
+                              }`}
+                              style={{
+                                minWidth: colWidth,
+                                width: colWidth,
+                                maxWidth:
+                                  isFirst || isLast ? colWidth : undefined,
+                                ...(isFirst ? { left: 0 } : {}),
+                                ...(isLast ? { right: 0 } : {}),
+                              }}
+                            >
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })
                 ) : loading ? (
-                  [...Array(25)].map((_, i) => (
-                    <TableRow
-                      key={`loading-row-${i}`}
-                      className="border-b-4   border-b-[#F8F8F8]"
-                    >
-                      {[...Array(columns.length)].map((_, j) => (
-                        <TableCell key={`loading-cell-${i}-${j}`} className="">
-                          {j == 1 ? (
-                            <div className="p-2 flex gap-2 items-center">
-                              <Skeleton className="h-7 w-7 rounded-full bg-gray-200" />
-                              <Skeleton className="h-3 w-3/5 bg-gray-200 rounded-none" />
-                            </div>
-                          ) : (
-                            <div className="p-2">
-                              <Skeleton className="h-3 w-3/5 bg-gray-200 rounded-none" />
-                            </div>
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <div></div>
-                )}
-              </TableBody>
-            </Table>
+                  [...Array(10)].map((_, i) => {
+                    const rowBg = i % 2 === 0 ? "bg-white" : "bg-slate-50/60";
+                    return (
+                      <tr key={`loading-row-${i}`} className={rowBg}>
+                        {[...Array(columns.length)].map((_, j) => {
+                          const isFirst = stickyFirstColumn && j === 0;
+                          const isLast =
+                            stickyLastColumn && j === columns.length - 1;
+                          const colWidth = getWidth(columns[j]?.id);
+
+                          return (
+                            <td
+                              key={`loading-cell-${i}-${j}`}
+                              className={`px-3.5 py-3 border-b border-slate-100 ${
+                                isFirst
+                                  ? `sticky left-0 z-20 ${rowBg} border-r border-slate-200 shadow-[4px_0_8px_-2px_rgba(0,0,0,0.06)]`
+                                  : ""
+                              } ${
+                                isLast
+                                  ? `sticky right-0 z-20 ${rowBg} border-l border-slate-200 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.06)]`
+                                  : ""
+                              }`}
+                              style={{
+                                minWidth: colWidth,
+                                width: colWidth,
+                                maxWidth:
+                                  isFirst || isLast ? colWidth : undefined,
+                                ...(isFirst ? { left: 0 } : {}),
+                                ...(isLast ? { right: 0 } : {}),
+                              }}
+                            >
+                              <Skeleton className="h-4 w-4/5 bg-slate-200 rounded-md" />
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })
+                ) : null}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
+
       {data?.length && paginationDetails ? (
-        <PaginationComponent
-          paginationDetails={paginationDetails}
-          capturePageNum={capturePageNum}
-          captureRowPerItems={captureRowPerItems}
-        />
-      ) : (
-        <div> </div>
-      )}
+        <div className="border-t border-slate-100 px-4 py-3 bg-white">
+          <PaginationComponent
+            paginationDetails={paginationDetails}
+            capturePageNum={capturePageNum}
+            captureRowPerItems={captureRowPerItems}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

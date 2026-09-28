@@ -10,58 +10,12 @@ import { n as clsx, t as cva } from "../_libs/class-variance-authority+clsx.mjs"
 import { t as twMerge } from "../_libs/tailwind-merge.mjs";
 import { a as ChevronDown, i as ChevronLeft, n as ChevronUp, o as Check, r as ChevronRight, t as Ellipsis } from "../_libs/lucide-react.mjs";
 import { t as require_dayjs_min } from "../_libs/dayjs.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/fota-information-BVvntHLr.js
+//#region node_modules/.nitro/vite/services/ssr/assets/fota-information-Dto4AQXa.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var import_dayjs_min = /* @__PURE__ */ __toESM(require_dayjs_min());
 function cn(...inputs) {
 	return twMerge(clsx(inputs));
-}
-function Table({ className, ...props }) {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		"data-slot": "table-container",
-		className: "relative w-full overflow-x-auto",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("table", {
-			"data-slot": "table",
-			className: cn("w-full caption-bottom text-sm", className),
-			...props
-		})
-	});
-}
-function TableHeader({ className, ...props }) {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", {
-		"data-slot": "table-header",
-		className: cn("[&_tr]:border-b", className),
-		...props
-	});
-}
-function TableBody({ className, ...props }) {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", {
-		"data-slot": "table-body",
-		className: cn("[&_tr:last-child]:border-0", className),
-		...props
-	});
-}
-function TableRow({ className, ...props }) {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tr", {
-		"data-slot": "table-row",
-		className: cn("border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted", className),
-		...props
-	});
-}
-function TableHead({ className, ...props }) {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
-		"data-slot": "table-head",
-		className: cn("h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0", className),
-		...props
-	});
-}
-function TableCell({ className, ...props }) {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
-		"data-slot": "table-cell",
-		className: cn("p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0", className),
-		...props
-	});
 }
 function Skeleton({ className, ...props }) {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
@@ -417,7 +371,7 @@ var PaginationComponent = ({ capturePageNum, captureRowPerItems, initialPage = 1
 		})]
 	});
 };
-var TanStackTable = ({ columns, data, loading = false, getData, paginationDetails, removeSortingForColumnIds, heightClass, noDataLabel, page, page_size }) => {
+var TanStackTable = ({ columns, data, loading = false, getData, paginationDetails, removeSortingForColumnIds, heightClass, noDataLabel, page, page_size, stickyFirstColumn = true, stickyLastColumn = true }) => {
 	const router = useRouter();
 	const [sorting, setSorting] = (0, import_react.useState)([]);
 	const location = useLocation();
@@ -450,8 +404,12 @@ var TanStackTable = ({ columns, data, loading = false, getData, paginationDetail
 		});
 	};
 	const getWidth = (id) => {
-		const widthObj = columns.find((col) => col.id === id);
-		return widthObj ? widthObj?.width || widthObj?.size || "100px" : "100px";
+		const widthObj = columns.find((col) => col.id === id || col.accessorKey === id);
+		if (!widthObj) return "130px";
+		const size = widthObj.width || widthObj.size;
+		if (typeof size === "number") return `${size}px`;
+		if (typeof size === "string") return size;
+		return "130px";
 	};
 	const sortAndGetData = (header) => {
 		if (removeSortingForColumnIds && removeSortingForColumnIds.length && removeSortingForColumnIds.includes(header.id)) return;
@@ -470,72 +428,99 @@ var TanStackTable = ({ columns, data, loading = false, getData, paginationDetail
 		});
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		className: "scrollbar overflow-x-auto  w-full ",
+		className: "w-full",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: ` overflow-auto scrollbar w-full relative  ease-in-out duration-300 transition-all ${heightClass ? heightClass : "h-auto"} [&>*:first-child]:h-full`,
+			className: `w-full overflow-x-auto scrollbar relative ${heightClass ? heightClass : "h-auto"}`,
 			children: !data?.length && !loading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "flex h-full mt-[5%] justify-center items-center overflow-hidden",
+				className: "flex min-h-[200px] justify-center items-center p-8",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					className: "text-[20px] flex items-center h-full text-[#333] font-[400]",
+					className: "text-sm font-medium text-slate-500",
 					children: noDataLabel ? noDataLabel : "No data available"
 				})
 			}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				className: "max-h-[calc(100vh-180px)]",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Table, {
-					className: "relative",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHeader, {
-						className: "sticky top-[0px] z-[1]  border-r-0",
-						children: table?.getHeaderGroups()?.map((headerGroup) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableRow, { children: headerGroup.headers.map((header, index) => {
-							return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+				className: "max-h-[calc(100vh-220px)] overflow-y-auto",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("table", {
+					className: "w-full caption-bottom text-sm border-separate border-spacing-0 relative",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("thead", {
+						className: "sticky top-0 z-30 shadow-sm",
+						children: table?.getHeaderGroups()?.map((headerGroup) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tr", { children: headerGroup.headers.map((header, index) => {
+							const isFirst = stickyFirstColumn && index === 0;
+							const isLast = stickyLastColumn && index === headerGroup.headers.length - 1;
+							const colWidth = getWidth(header.id);
+							return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("th", {
 								colSpan: header.colSpan,
-								className: "bg-black",
+								className: `bg-slate-900 text-white font-semibold text-xs tracking-wider uppercase text-left px-3.5 py-3 border-b border-slate-800 whitespace-nowrap select-none ${isFirst ? "sticky left-0 z-40 border-r border-slate-700 shadow-[4px_0_8px_-2px_rgba(0,0,0,0.35)]" : ""} ${isLast ? "sticky right-0 z-40 border-l border-slate-700 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.35)]" : ""}`,
 								style: {
-									minWidth: getWidth(header.id),
-									width: getWidth(header.id),
-									color: "#fff",
-									fontWeight: "500"
+									minWidth: colWidth,
+									width: colWidth,
+									maxWidth: isFirst || isLast ? colWidth : void 0,
+									...isFirst ? { left: 0 } : {},
+									...isLast ? { right: 0 } : {}
 								},
 								children: header.isPlaceholder ? null : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: `flex items-center gap-1 ${header.column.getCanSort() ? "cursor-pointer select-none" : ""}`,
+									className: `flex items-center gap-1.5 ${header.column.getCanSort() ? "cursor-pointer select-none hover:text-indigo-300 transition-colors" : ""}`,
 									onClick: () => sortAndGetData(header),
-									style: {
-										minWidth: getWidth(header.id),
-										width: getWidth(header.id)
-									},
 									children: flexRender(header.column.columnDef.header, header.getContext())
 								})
-							}, index + `-${(/* @__PURE__ */ new Date()).getTime()}`);
-						}) }, headerGroup.id + `-${(/* @__PURE__ */ new Date()).getTime()}`))
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, {
-						className: "border-x",
-						children: data?.length ? table?.getRowModel().rows.map((row) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableRow, {
-							className: "border-b-0 hover:bg-gray-300 even:bg-gray-100 transition-colors duration-200 ",
-							...row?.original.issue_id && row?.id && !row?.original.service_type ? { onClick: () => router.navigate({ to: `/devices/${row.original.id}/info` }) } : {},
-							children: row.getVisibleCells().map((cell) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-								className: "p-2 !bg-transparent",
-								children: flexRender(cell.column.columnDef.cell, cell.getContext())
-							}, cell.id + `-${(/* @__PURE__ */ new Date()).getTime()}`))
-						}, row.id + `-${(/* @__PURE__ */ new Date()).getTime()}`)) : loading ? [...Array(25)].map((_, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableRow, {
-							className: "border-b-4   border-b-[#F8F8F8]",
-							children: [...Array(columns.length)].map((_, j) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-								className: "",
-								children: j == 1 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "p-2 flex gap-2 items-center",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Skeleton, { className: "h-7 w-7 rounded-full bg-gray-200" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Skeleton, { className: "h-3 w-3/5 bg-gray-200 rounded-none" })]
-								}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "p-2",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Skeleton, { className: "h-3 w-3/5 bg-gray-200 rounded-none" })
+							}, header.id);
+						}) }, headerGroup.id))
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tbody", {
+						className: "divide-y divide-slate-100",
+						children: data?.length ? table.getRowModel().rows.map((row, rowIndex) => {
+							const rowBg = rowIndex % 2 === 0 ? "bg-white" : "bg-slate-50/60";
+							return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tr", {
+								className: `group ${rowBg} hover:bg-indigo-50/40 transition-colors duration-150 ${(row?.original)?.issue_id && row?.id && !(row?.original)?.service_type ? "cursor-pointer" : ""}`,
+								...(row?.original)?.issue_id && row?.id && !(row?.original)?.service_type ? { onClick: () => router.navigate({ to: `/devices/${row.original.id}/info` }) } : {},
+								children: row.getVisibleCells().map((cell, cellIndex) => {
+									const isFirst = stickyFirstColumn && cellIndex === 0;
+									const isLast = stickyLastColumn && cellIndex === row.getVisibleCells().length - 1;
+									const colWidth = getWidth(cell.column.id);
+									return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+										className: `px-3.5 py-2.5 text-sm align-middle whitespace-nowrap border-b border-slate-100 ${isFirst ? `sticky left-0 z-20 ${rowBg} group-hover:bg-[#f1f5f9] border-r border-slate-200 shadow-[4px_0_8px_-2px_rgba(0,0,0,0.06)]` : ""} ${isLast ? `sticky right-0 z-20 ${rowBg} group-hover:bg-[#f1f5f9] border-l border-slate-200 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.06)]` : ""}`,
+										style: {
+											minWidth: colWidth,
+											width: colWidth,
+											maxWidth: isFirst || isLast ? colWidth : void 0,
+											...isFirst ? { left: 0 } : {},
+											...isLast ? { right: 0 } : {}
+										},
+										children: flexRender(cell.column.columnDef.cell, cell.getContext())
+									}, cell.id);
 								})
-							}, `loading-cell-${i}-${j}`))
-						}, `loading-row-${i}`)) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {})
+							}, row.id);
+						}) : loading ? [...Array(10)].map((_, i) => {
+							const rowBg = i % 2 === 0 ? "bg-white" : "bg-slate-50/60";
+							return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("tr", {
+								className: rowBg,
+								children: [...Array(columns.length)].map((_, j) => {
+									const isFirst = stickyFirstColumn && j === 0;
+									const isLast = stickyLastColumn && j === columns.length - 1;
+									const colWidth = getWidth(columns[j]?.id);
+									return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+										className: `px-3.5 py-3 border-b border-slate-100 ${isFirst ? `sticky left-0 z-20 ${rowBg} border-r border-slate-200 shadow-[4px_0_8px_-2px_rgba(0,0,0,0.06)]` : ""} ${isLast ? `sticky right-0 z-20 ${rowBg} border-l border-slate-200 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.06)]` : ""}`,
+										style: {
+											minWidth: colWidth,
+											width: colWidth,
+											maxWidth: isFirst || isLast ? colWidth : void 0,
+											...isFirst ? { left: 0 } : {},
+											...isLast ? { right: 0 } : {}
+										},
+										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Skeleton, { className: "h-4 w-4/5 bg-slate-200 rounded-md" })
+									}, `loading-cell-${i}-${j}`);
+								})
+							}, `loading-row-${i}`);
+						}) : null
 					})]
 				})
 			})
-		}), data?.length && paginationDetails ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PaginationComponent, {
-			paginationDetails,
-			capturePageNum,
-			captureRowPerItems
-		}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: " " })]
+		}), data?.length && paginationDetails ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			className: "border-t border-slate-100 px-4 py-3 bg-white",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PaginationComponent, {
+				paginationDetails,
+				capturePageNum,
+				captureRowPerItems
+			})
+		}) : null]
 	});
 };
 var StatusPill = ({ value }) => {
@@ -580,15 +565,16 @@ var FotaHistoryColumns = () => {
 	return [
 		columnHelper.accessor("id", {
 			header: "ID",
-			size: 60,
+			size: 70,
 			cell: (info) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-				className: "text-xs font-mono text-slate-500",
+				className: "text-xs font-mono font-semibold text-slate-700",
 				children: ["#", info.getValue()]
 			})
 		}),
 		columnHelper.accessor("deviceOldVersion", {
 			id: "device_version",
 			header: "Device",
+			size: 160,
 			cell: (info) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(VersionCell, {
 				oldV: info.row.original.deviceOldVersion,
 				newV: info.row.original.deviceNewVersion
@@ -597,6 +583,7 @@ var FotaHistoryColumns = () => {
 		columnHelper.accessor("webOldVersion", {
 			id: "web_version",
 			header: "Web",
+			size: 160,
 			cell: (info) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(VersionCell, {
 				oldV: info.row.original.webOldVersion,
 				newV: info.row.original.webNewVersion
@@ -605,6 +592,7 @@ var FotaHistoryColumns = () => {
 		columnHelper.accessor("fotaOldVersion", {
 			id: "fota_version",
 			header: "FOTA",
+			size: 160,
 			cell: (info) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(VersionCell, {
 				oldV: info.row.original.fotaOldVersion,
 				newV: info.row.original.fotaNewVersion
@@ -612,14 +600,17 @@ var FotaHistoryColumns = () => {
 		}),
 		columnHelper.accessor("deviceStatus", {
 			header: "Device Status",
+			size: 130,
 			cell: (info) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(StatusPill, { value: info.getValue() })
 		}),
 		columnHelper.accessor("webStatus", {
 			header: "Web Status",
+			size: 130,
 			cell: (info) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(StatusPill, { value: info.getValue() })
 		}),
 		columnHelper.accessor("fotaStatus", {
 			header: "FOTA Status",
+			size: 130,
 			cell: (info) => {
 				const value = info.getValue();
 				if (!value) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
@@ -634,6 +625,7 @@ var FotaHistoryColumns = () => {
 		}),
 		columnHelper.accessor("proposedBy", {
 			header: "Proposed By",
+			size: 210,
 			cell: (info) => {
 				const email = info.getValue();
 				const name = info.row.original.proposedByName;
@@ -655,6 +647,7 @@ var FotaHistoryColumns = () => {
 		}),
 		columnHelper.accessor("createdAt", {
 			header: "Created At",
+			size: 180,
 			cell: (info) => {
 				const value = info.getValue();
 				if (!value) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {

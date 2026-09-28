@@ -70,9 +70,9 @@ const FotaHistoryColumns = () => {
   const columns = [
     columnHelper.accessor("id", {
       header: "ID",
-      size: 60,
+      size: 70,
       cell: (info) => (
-        <span className="text-xs font-mono text-slate-500">
+        <span className="text-xs font-mono font-semibold text-slate-700">
           #{info.getValue()}
         </span>
       ),
@@ -80,6 +80,7 @@ const FotaHistoryColumns = () => {
     columnHelper.accessor("deviceOldVersion", {
       id: "device_version",
       header: "Device",
+      size: 160,
       cell: (info) => (
         <VersionCell
           oldV={info.row.original.deviceOldVersion}
@@ -90,6 +91,7 @@ const FotaHistoryColumns = () => {
     columnHelper.accessor("webOldVersion", {
       id: "web_version",
       header: "Web",
+      size: 160,
       cell: (info) => (
         <VersionCell
           oldV={info.row.original.webOldVersion}
@@ -100,6 +102,7 @@ const FotaHistoryColumns = () => {
     columnHelper.accessor("fotaOldVersion", {
       id: "fota_version",
       header: "FOTA",
+      size: 160,
       cell: (info) => (
         <VersionCell
           oldV={info.row.original.fotaOldVersion}
@@ -109,14 +112,17 @@ const FotaHistoryColumns = () => {
     }),
     columnHelper.accessor("deviceStatus", {
       header: "Device Status",
+      size: 130,
       cell: (info) => <StatusPill value={info.getValue()} />,
     }),
     columnHelper.accessor("webStatus", {
       header: "Web Status",
+      size: 130,
       cell: (info) => <StatusPill value={info.getValue()} />,
     }),
     columnHelper.accessor("fotaStatus", {
       header: "FOTA Status",
+      size: 130,
       cell: (info) => {
         const value = info.getValue();
         if (!value) return <span className="text-slate-300 text-xs">—</span>;
@@ -127,6 +133,7 @@ const FotaHistoryColumns = () => {
     }),
     columnHelper.accessor("proposedBy", {
       header: "Proposed By",
+      size: 210,
       cell: (info) => {
         const email = info.getValue();
         const name = info.row.original.proposedByName;
@@ -147,6 +154,7 @@ const FotaHistoryColumns = () => {
     }),
     columnHelper.accessor("createdAt", {
       header: "Created At",
+      size: 180,
       cell: (info) => {
         const value = info.getValue();
         if (!value) return <span className="text-slate-300 text-xs">—</span>;
