@@ -1,0 +1,1 @@
+export const ALLOWED_ARCHIVE_EXTENSIONS = [".zip", ".7z"];

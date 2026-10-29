@@ -1,4 +1,3 @@
-
 import {
   AddDetailsIntoFotaDb,
   getDevicesDetails,
@@ -10,484 +9,37 @@ import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "@tanstack/react-router";
 import { validateVersion, bumpVersion } from "@/lib/versionUtils";
+import {
+  IconAlertCircle,
+  IconServer,
+  IconLogout,
+  IconSignal,
+  IconClock,
+  IconHardDrive,
+  IconActivity,
+  IconCheck,
+  IconGlobe,
+  IconChevron,
+  IconArrow,
+  IconX,
+  IconChip,
+  IconRefresh,
+} from "@/icons/icons";
+import {
+  TrackStatusPill,
+  StatusBadge,
+  formatDate,
+} from "@/helpers/SubComponents";
+import FileUploadZone from "@/helpers/SubComponents";
+import { ALLOWED_ARCHIVE_EXTENSIONS } from "@/lib/constants/allowedArchiveExtensions";
+import {
+  FotaDetailsRow,
+  DeviceListItem,
+  FotaTextFields,
+} from "@/lib/types/file-types";
+import { read7zFile, readZipFile } from "@/helpers/readFileData";
 
-const IconAlertCircle = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-    />
-  </svg>
-);
-
-/* ─────────────────────────── Types ─────────────────────────── */
-
-type FotaTextFields = {
-  device_id: number;
-  device_old_version: string;
-  device_new_version: string;
-  web_old_version: string;
-  web_new_version: string;
-  fota_old_version: string;
-  fota_new_version: string;
-};
-
-type DeviceListItem = {
-  id: number;
-  hardwareUuid: string;
-  name: string | null;
-  siteId: number | null;
-  status: string | null;
-  firmwareVersion: string | null;
-  deviceVersion: string | null;
-  lastHeartbeat: string | null;
-  createdAt: string | null;
-};
-
-type FotaDetailsRow = {
-  id: number;
-  deviceId: number;
-  deviceOldVersion: string;
-  deviceNewVersion: string;
-  webOldVersion: string;
-  webNewVersion: string;
-  deviceStatus: number;
-  webStatus: number;
-  deviceFotaUrl: string;
-  webFotaUrl: string;
-  fotaOldVersion: string;
-  fotaNewVersion: string;
-  fotaUpdateUrl: string;
-  fotaStatus: string;
-  createdAt: string | null;
-  [key: string]: unknown;
-};
-
-/* ─────────────────────────── Constants ─────────────────────────── */
-
-const ALLOWED_ARCHIVE_EXTENSIONS = [".zip", ".7z"];
-
-/* ─────────────────────────── Icons ─────────────────────────── */
-
-const IconServer = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"
-    />
-  </svg>
-);
-
-const IconChip = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-    />
-  </svg>
-);
-
-const IconGlobe = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-    />
-  </svg>
-);
-
-const IconRefresh = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-    />
-  </svg>
-);
-
-const IconUpload = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-    />
-  </svg>
-);
-
-const IconArrow = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M13 7l5 5m0 0l-5 5m5-5H6"
-    />
-  </svg>
-);
-
-const IconX = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M6 18L18 6M6 6l12 12"
-    />
-  </svg>
-);
-
-const IconCheck = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M5 13l4 4L19 7"
-    />
-  </svg>
-);
-
-const IconChevron = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M19 9l-7 7-7-7"
-    />
-  </svg>
-);
-
-const IconActivity = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M13 10V3L4 14h7v7l9-11h-7z"
-    />
-  </svg>
-);
-
-const IconHardDrive = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"
-    />
-  </svg>
-);
-
-const IconClock = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-    />
-  </svg>
-);
-
-const IconSignal = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
-    />
-  </svg>
-);
-
-const IconLogout = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.5}
-      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-    />
-  </svg>
-);
-
-/* ─────────────────────────── Helpers ─────────────────────────── */
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return "0 B";
-  const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
-}
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return "—";
-
-  // Tell JavaScript the input is UTC
-  const d = new Date(dateStr.endsWith("Z") ? dateStr : dateStr + "Z");
-
-  return d.toLocaleString("en-IN", {
-    timeZone: "Asia/Kolkata",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
-}
-/* ─────────────────────────── Sub-Components ─────────────────────────── */
-
-function StatusBadge({ status }: { status: string | null }) {
-  const isOnline = status?.toLowerCase() === "online";
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
-        isOnline
-          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-          : "bg-amber-50 text-amber-700 border-amber-200"
-      }`}
-    >
-      <span
-        className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-500" : "bg-amber-500"}`}
-      />
-      {status || "Unknown"}
-    </span>
-  );
-}
-
-function TrackStatusPill({
-  value,
-}: {
-  value: number | string | null | undefined;
-}) {
-  if (value === 1 || value === "APPLIED" || value === "SUCCESS") {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-        Success
-      </span>
-    );
-  }
-  if (value === -1 || value === "FAILED") {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-        <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-        Failed
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-      {typeof value === "string" && value ? value : "Pending"}
-    </span>
-  );
-}
-
-function FileUploadZone({
-  file,
-  onFileChange,
-  disabled,
-  label,
-  dragActive,
-  onDrag,
-}: {
-  file: File | null;
-  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  disabled: boolean;
-  label: string;
-  dragActive: boolean;
-  onDrag: (active: boolean) => void;
-}) {
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    onDrag(true);
-  };
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    onDrag(false);
-  };
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    onDrag(false);
-    const dropped = e.dataTransfer.files?.[0];
-    if (!dropped) return;
-    const name = dropped.name.toLowerCase();
-    const ok = ALLOWED_ARCHIVE_EXTENSIONS.some((ext) => name.endsWith(ext));
-    if (!ok) {
-      toast.error("Please drop a .zip or .7z file");
-      return;
-    }
-    // Simulate change event
-    const dt = new DataTransfer();
-    dt.items.add(dropped);
-    const synthetic = {
-      target: { files: dt.files },
-    } as React.ChangeEvent<HTMLInputElement>;
-    onFileChange(synthetic);
-  };
-
-  if (file) {
-    return (
-      <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center shrink-0">
-            <IconUpload className="w-4 h-4 text-indigo-600" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-slate-900 truncate">
-              {file.name}
-            </p>
-            <p className="text-xs text-slate-500">{formatBytes(file.size)}</p>
-          </div>
-        </div>
-        <button
-          onClick={() =>
-            onFileChange({
-              target: { files: null },
-            } as React.ChangeEvent<HTMLInputElement>)
-          }
-          className="p-1.5 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-600"
-        >
-          <IconX />
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <label
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-      className={`flex flex-col items-center justify-center w-full h-28 rounded-xl border-2 border-dashed transition-all cursor-pointer ${
-        disabled
-          ? "bg-slate-50 border-slate-200 opacity-50 cursor-not-allowed"
-          : dragActive
-            ? "bg-indigo-50 border-indigo-400"
-            : "bg-slate-50/50 border-slate-300 hover:border-slate-400 hover:bg-slate-50"
-      }`}
-    >
-      <div className="flex flex-col items-center gap-2">
-        <div
-          className={`p-2 rounded-lg transition-colors ${dragActive ? "bg-indigo-100" : "bg-slate-100"}`}
-        >
-          <IconUpload
-            className={`w-5 h-5 ${dragActive ? "text-indigo-600" : "text-slate-400"}`}
-          />
-        </div>
-        <div className="text-center">
-          <p className="text-xs font-medium text-slate-700">
-            <span className="text-indigo-600">Click to upload</span> or drag and
-            drop
-          </p>
-          <p className="text-[10px] text-slate-400 mt-0.5">
-            .zip or .7z up to any size
-          </p>
-        </div>
-      </div>
-      <input
-        type="file"
-        accept=".zip,.7z"
-        onChange={onFileChange}
-        disabled={disabled}
-        className="hidden"
-      />
-    </label>
-  );
-}
-
-/* ─────────────────────────── Main Component ─────────────────────────── */
+const FiXED_FILE_SIZE = 5 * 1024 * 1024;
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
@@ -526,12 +78,18 @@ export default function DashboardPage() {
     }
   };
 
-
   const [deviceZipFile, setDeviceZipFile] = useState<File | null>(null);
   const [webZipFile, setWebZipFile] = useState<File | null>(null);
   const [fotaZipFile, setFotaZipFile] = useState<File | null>(null);
 
   const [dragActiveZone, setDragActiveZone] = useState<string | null>(null);
+  const [allowedFileSize, setAllowedFileSize] = useState(false);
+  const [device_image_version, set_device_image_version] = useState<
+    string | null
+  >(null);
+  const [web_image_version, set_web_image_version] = useState<string | null>(
+    null,
+  );
 
   /* ── Queries ── */
   const {
@@ -661,12 +219,8 @@ export default function DashboardPage() {
   const isDeviceTrackActive = Boolean(
     fotaForm.device_new_version || deviceZipFile,
   );
-  const isWebTrackActive = Boolean(
-    fotaForm.web_new_version || webZipFile,
-  );
-  const isFotaTrackActive = Boolean(
-    fotaForm.fota_new_version || fotaZipFile,
-  );
+  const isWebTrackActive = Boolean(fotaForm.web_new_version || webZipFile);
+  const isFotaTrackActive = Boolean(fotaForm.fota_new_version || fotaZipFile);
   const hasAnyTrackActive =
     isDeviceTrackActive || isWebTrackActive || isFotaTrackActive;
 
@@ -676,31 +230,21 @@ export default function DashboardPage() {
     fotaForm.fota_new_version,
   );
 
-  const hasAnyFile = Boolean(
-    deviceZipFile || webZipFile || fotaZipFile,
-  );
+  const hasAnyFile = Boolean(deviceZipFile || webZipFile || fotaZipFile);
 
   const deviceValidation = useMemo(
     () =>
-      validateVersion(
-        fotaForm.device_new_version,
-        fotaForm.device_old_version,
-      ),
+      validateVersion(fotaForm.device_new_version, fotaForm.device_old_version),
     [fotaForm.device_new_version, fotaForm.device_old_version],
   );
 
   const webValidation = useMemo(
-    () =>
-      validateVersion(fotaForm.web_new_version, fotaForm.web_old_version),
+    () => validateVersion(fotaForm.web_new_version, fotaForm.web_old_version),
     [fotaForm.web_new_version, fotaForm.web_old_version],
   );
 
   const fotaValidation = useMemo(
-    () =>
-      validateVersion(
-        fotaForm.fota_new_version,
-        fotaForm.fota_old_version,
-      ),
+    () => validateVersion(fotaForm.fota_new_version, fotaForm.fota_old_version),
     [fotaForm.fota_new_version, fotaForm.fota_old_version],
   );
 
@@ -708,7 +252,8 @@ export default function DashboardPage() {
     if (!fotaForm.device_id || !hasAnyTrackActive) return false;
 
     if (isDeviceTrackActive) {
-      if (!deviceValidation.isValid || !deviceValidation.isGreater) return false;
+      if (!deviceValidation.isValid || !deviceValidation.isGreater)
+        return false;
     }
     if (isWebTrackActive) {
       if (!webValidation.isValid || !webValidation.isGreater) return false;
@@ -773,21 +318,163 @@ export default function DashboardPage() {
     setFotaForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  // const handleFileChange =
+  //   (
+  //     setter: (file: File | null) => void,
+  //     component: "device" | "web" | "fota",
+  //   ) =>
+  //   async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     let file = e.target.files?.[0] ?? null;
+  //     const fileName = file?.name.toLowerCase() ?? "";
+  //     const fileExtension = file?.name.split(".")?.[1];
+  //     const fileSize = file?.size ?? 0;
+  //     const isAllowed = ALLOWED_ARCHIVE_EXTENSIONS.some((ext) =>
+  //       fileName.endsWith(ext),
+  //     );
+
+  //     let check_firmware_device_image_version;
+  //     let check_firmware_web_image_version;
+
+  //     if (file) {
+  //       if (fileExtension === "zip") {
+  //         if (component === "device") {
+  //           check_firmware_device_image_version =
+  //             (await readZipFile(file, "TU_APP_IPC.py")) ?? "";
+  //           set_device_image_version(check_firmware_device_image_version);
+  //         } else {
+  //           check_firmware_web_image_version =
+  //             (await readZipFile(file, "TU_web/TU_Web_IPC.py")) ?? "";
+  //           set_web_image_version(check_firmware_web_image_version);
+  //         }
+  //       } else {
+  //         check_firmware_web_image_version = read7zFile(
+  //           file,
+  //           "TU_APP_IPC.py",
+  //           "12345",
+  //         );
+  //       }
+  //     }
+
+  //     if (file && fileSize > FiXED_FILE_SIZE) {
+  //       toast.error(`File size exceeds limit ${fileSize}`);
+  //       setAllowedFileSize(false);
+  //       file = null;
+  //     } else {
+  //       setAllowedFileSize(true);
+  //     }
+
+  //     if (file && !isAllowed) {
+  //       toast.error("Please select a .zip or .7z file");
+  //       e.target.value = "";
+  //       setter(null);
+  //       return;
+  //     }
+  //     setter(file);
+  //   };
+
   const handleFileChange =
-    (setter: (file: File | null) => void) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0] ?? null;
-      const fileName = file?.name.toLowerCase() ?? "";
+    (
+      setter: (file: File | null) => void,
+      component: "device" | "web" | "fota",
+    ) =>
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      let file = e.target.files?.[0] ?? null;
+
+      if (!file) {
+        setter(null);
+        return;
+      }
+
+      const fileName = file.name.toLowerCase();
+      const fileExtension = fileName.split(".").pop() ?? "";
+      const fileSize = file.size;
+
       const isAllowed = ALLOWED_ARCHIVE_EXTENSIONS.some((ext) =>
         fileName.endsWith(ext),
       );
-      if (file && !isAllowed) {
+
+      if (!isAllowed) {
         toast.error("Please select a .zip or .7z file");
         e.target.value = "";
         setter(null);
         return;
       }
-      setter(file);
+
+      if (fileSize > FiXED_FILE_SIZE) {
+        toast.error(`File size exceeds limit ${FiXED_FILE_SIZE}`);
+        setAllowedFileSize(false);
+        e.target.value = "";
+        setter(null);
+        return;
+      }
+
+      setAllowedFileSize(true);
+
+      try {
+        if (fileExtension === "zip") {
+          let version: string;
+
+          if (component === "device") {
+            version = await readZipFile(file, "TU_APP_IPC.py");
+
+            set_device_image_version(version);
+
+            setFotaForm((prev) => ({
+              ...prev,
+              device_new_version: version,
+            }));
+          } else if (component === "web") {
+            version = await readZipFile(file, "TU_web/TU_Web_IPC.py");
+
+            set_web_image_version(version);
+
+            setFotaForm((prev) => ({
+              ...prev,
+              web_new_version: version,
+            }));
+          } else {
+            // Add FOTA ZIP version extraction here once its
+            // internal Python file path and version variable are known.
+          }
+        } else {
+          toast.error("Only ZIP files are supported for version extraction.");
+          e.target.value = "";
+          setter(null);
+          return;
+        }
+
+        setter(file);
+        toast.success(
+          `${component === "web" ? "Web" : component === "device" ? "Device" : "FOTA"} version detected`,
+        );
+      } catch (error) {
+        console.error("Failed to read version from ZIP:", error);
+
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Failed to read version from ZIP",
+        );
+
+        e.target.value = "";
+        setter(null);
+
+        if (component === "device") {
+          set_device_image_version(null);
+          setFotaForm((prev) => ({
+            ...prev,
+            device_new_version: "",
+          }));
+        } else if (component === "web") {
+          set_web_image_version(null);
+          setFotaForm((prev) => ({
+            ...prev,
+            web_new_version: "",
+          }));
+        }
+
+        return;
+      }
     };
 
   const handleSubmit = async () => {
@@ -800,16 +487,34 @@ export default function DashboardPage() {
       return;
     }
 
-    if (isDeviceTrackActive && (!deviceValidation.isValid || !deviceValidation.isGreater)) {
-      toast.error(deviceValidation.error || "Device new version is invalid or not greater than current version");
+    if (
+      isDeviceTrackActive &&
+      (!deviceValidation.isValid || !deviceValidation.isGreater)
+    ) {
+      toast.error(
+        deviceValidation.error ||
+          "Device new version is invalid or not greater than current version",
+      );
       return;
     }
-    if (isWebTrackActive && (!webValidation.isValid || !webValidation.isGreater)) {
-      toast.error(webValidation.error || "Web new version is invalid or not greater than current version");
+    if (
+      isWebTrackActive &&
+      (!webValidation.isValid || !webValidation.isGreater)
+    ) {
+      toast.error(
+        webValidation.error ||
+          "Web new version is invalid or not greater than current version",
+      );
       return;
     }
-    if (isFotaTrackActive && (!fotaValidation.isValid || !fotaValidation.isGreater)) {
-      toast.error(fotaValidation.error || "FOTA new version is invalid or not greater than current version");
+    if (
+      isFotaTrackActive &&
+      (!fotaValidation.isValid || !fotaValidation.isGreater)
+    ) {
+      toast.error(
+        fotaValidation.error ||
+          "FOTA new version is invalid or not greater than current version",
+      );
       return;
     }
 
@@ -857,7 +562,6 @@ export default function DashboardPage() {
     }
   };
 
-  /* ── Render ── */
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Top Navigation */}
@@ -1159,7 +863,8 @@ export default function DashboardPage() {
                       placeholder="e.g. 1.2.0 or v1.2.0"
                       className={`h-10 px-3 w-full bg-white border rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none transition-all disabled:bg-slate-50 disabled:cursor-not-allowed ${
                         fotaForm.device_new_version
-                          ? deviceValidation.isValid && deviceValidation.isGreater
+                          ? deviceValidation.isValid &&
+                            deviceValidation.isGreater
                             ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 bg-emerald-50/20"
                             : "border-rose-400 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20"
                           : "border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
@@ -1175,18 +880,23 @@ export default function DashboardPage() {
                     <span>{deviceValidation.error}</span>
                   </p>
                 )}
-                {fotaForm.device_new_version && deviceValidation.isValid && deviceValidation.isGreater && (
-                  <p className="text-emerald-600 text-xs font-medium flex items-center gap-1.5">
-                    <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
-                    <span>
-                      Valid upgrade: {fotaForm.device_old_version || "0.0.0"} → {fotaForm.device_new_version}
-                    </span>
-                  </p>
-                )}
+                {fotaForm.device_new_version &&
+                  deviceValidation.isValid &&
+                  deviceValidation.isGreater && (
+                    <p className="text-emerald-600 text-xs font-medium flex items-center gap-1.5">
+                      <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
+                      <span>
+                        Valid upgrade: {fotaForm.device_old_version || "0.0.0"}{" "}
+                        → {fotaForm.device_new_version}
+                      </span>
+                    </p>
+                  )}
                 {!fotaForm.device_new_version && deviceZipFile && (
                   <p className="text-amber-600 text-xs font-medium flex items-center gap-1.5">
                     <IconAlertCircle className="w-3.5 h-3.5 shrink-0 text-amber-500" />
-                    <span>Package archive attached — enter a greater target version</span>
+                    <span>
+                      Package archive attached — enter a greater target version
+                    </span>
                   </p>
                 )}
 
@@ -1206,7 +916,8 @@ export default function DashboardPage() {
                       }
                       className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200"
                     >
-                      +Patch ({bumpVersion(fotaForm.device_old_version, "patch")})
+                      +Patch (
+                      {bumpVersion(fotaForm.device_old_version, "patch")})
                     </button>
                     <button
                       type="button"
@@ -1218,7 +929,8 @@ export default function DashboardPage() {
                       }
                       className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200"
                     >
-                      +Minor ({bumpVersion(fotaForm.device_old_version, "minor")})
+                      +Minor (
+                      {bumpVersion(fotaForm.device_old_version, "minor")})
                     </button>
                     <button
                       type="button"
@@ -1230,7 +942,8 @@ export default function DashboardPage() {
                       }
                       className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200"
                     >
-                      +Major ({bumpVersion(fotaForm.device_old_version, "major")})
+                      +Major (
+                      {bumpVersion(fotaForm.device_old_version, "major")})
                     </button>
                   </div>
                 )}
@@ -1241,7 +954,7 @@ export default function DashboardPage() {
                   </label>
                   <FileUploadZone
                     file={deviceZipFile}
-                    onFileChange={handleFileChange(setDeviceZipFile)}
+                    onFileChange={handleFileChange(setDeviceZipFile, "device")}
                     disabled={!fotaForm.device_id}
                     label="device"
                     dragActive={dragActiveZone === "device"}
@@ -1267,7 +980,9 @@ export default function DashboardPage() {
                     <h3 className="text-sm font-bold text-slate-900">
                       Web Application
                     </h3>
-                    <p className="text-[11px] text-slate-500">Frontend bundle</p>
+                    <p className="text-[11px] text-slate-500">
+                      Frontend bundle
+                    </p>
                   </div>
                 </div>
                 {isWebTrackActive ? (
@@ -1314,7 +1029,7 @@ export default function DashboardPage() {
                       onChange={(e) =>
                         handleVersionChange("web_new_version", e.target.value)
                       }
-                      disabled={!fotaForm.device_id}
+                      disabled={!fotaForm.device_id || fotaForm.web_new_version ? true : false}
                       placeholder="e.g. 2.0.0 or v2.0.0"
                       className={`h-10 px-3 w-full bg-white border rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none transition-all disabled:bg-slate-50 disabled:cursor-not-allowed ${
                         fotaForm.web_new_version
@@ -1334,18 +1049,23 @@ export default function DashboardPage() {
                     <span>{webValidation.error}</span>
                   </p>
                 )}
-                {fotaForm.web_new_version && webValidation.isValid && webValidation.isGreater && (
-                  <p className="text-emerald-600 text-xs font-medium flex items-center gap-1.5">
-                    <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
-                    <span>
-                      Valid upgrade: {fotaForm.web_old_version || "0.0.0"} → {fotaForm.web_new_version}
-                    </span>
-                  </p>
-                )}
+                {fotaForm.web_new_version &&
+                  webValidation.isValid &&
+                  webValidation.isGreater && (
+                    <p className="text-emerald-600 text-xs font-medium flex items-center gap-1.5">
+                      <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
+                      <span>
+                        Valid upgrade: {fotaForm.web_old_version || "0.0.0"} →{" "}
+                        {fotaForm.web_new_version}
+                      </span>
+                    </p>
+                  )}
                 {!fotaForm.web_new_version && webZipFile && (
                   <p className="text-amber-600 text-xs font-medium flex items-center gap-1.5">
                     <IconAlertCircle className="w-3.5 h-3.5 shrink-0 text-amber-500" />
-                    <span>Package archive attached — enter a greater target version</span>
+                    <span>
+                      Package archive attached — enter a greater target version
+                    </span>
                   </p>
                 )}
 
@@ -1400,7 +1120,7 @@ export default function DashboardPage() {
                   </label>
                   <FileUploadZone
                     file={webZipFile}
-                    onFileChange={handleFileChange(setWebZipFile)}
+                    onFileChange={handleFileChange(setWebZipFile, "web")}
                     disabled={!fotaForm.device_id}
                     label="web"
                     dragActive={dragActiveZone === "web"}
@@ -1495,18 +1215,23 @@ export default function DashboardPage() {
                     <span>{fotaValidation.error}</span>
                   </p>
                 )}
-                {fotaForm.fota_new_version && fotaValidation.isValid && fotaValidation.isGreater && (
-                  <p className="text-emerald-600 text-xs font-medium flex items-center gap-1.5">
-                    <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
-                    <span>
-                      Valid upgrade: {fotaForm.fota_old_version || "0.0.0"} → {fotaForm.fota_new_version}
-                    </span>
-                  </p>
-                )}
+                {fotaForm.fota_new_version &&
+                  fotaValidation.isValid &&
+                  fotaValidation.isGreater && (
+                    <p className="text-emerald-600 text-xs font-medium flex items-center gap-1.5">
+                      <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
+                      <span>
+                        Valid upgrade: {fotaForm.fota_old_version || "0.0.0"} →{" "}
+                        {fotaForm.fota_new_version}
+                      </span>
+                    </p>
+                  )}
                 {!fotaForm.fota_new_version && fotaZipFile && (
                   <p className="text-amber-600 text-xs font-medium flex items-center gap-1.5">
                     <IconAlertCircle className="w-3.5 h-3.5 shrink-0 text-amber-500" />
-                    <span>Package archive attached — enter a greater target version</span>
+                    <span>
+                      Package archive attached — enter a greater target version
+                    </span>
                   </p>
                 )}
 
@@ -1561,7 +1286,7 @@ export default function DashboardPage() {
                   </label>
                   <FileUploadZone
                     file={fotaZipFile}
-                    onFileChange={handleFileChange(setFotaZipFile)}
+                    onFileChange={handleFileChange(setFotaZipFile, "fota")}
                     disabled={!fotaForm.device_id}
                     label="fota"
                     dragActive={dragActiveZone === "fota"}
@@ -1595,7 +1320,8 @@ export default function DashboardPage() {
                     )}
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Most recent firmware, web, and updater release for this device
+                    Most recent firmware, web, and updater release for this
+                    device
                   </p>
                 </div>
               </div>
@@ -1622,9 +1348,7 @@ export default function DashboardPage() {
                       <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                         Device Firmware
                       </span>
-                      <TrackStatusPill
-                        value={latestFotaRecord.deviceStatus}
-                      />
+                      <TrackStatusPill value={latestFotaRecord.deviceStatus} />
                     </div>
                     <div className="flex items-baseline gap-2 mb-2">
                       <span className="text-sm font-mono font-semibold text-slate-800">
@@ -1637,9 +1361,7 @@ export default function DashboardPage() {
                     </div>
                     <div
                       className="text-[11px] text-slate-500 truncate"
-                      title={
-                        latestFotaRecord.deviceFotaUrl || "No archive"
-                      }
+                      title={latestFotaRecord.deviceFotaUrl || "No archive"}
                     >
                       Package:{" "}
                       <span className="font-mono text-slate-700">
@@ -1654,9 +1376,7 @@ export default function DashboardPage() {
                       <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                         Web Application
                       </span>
-                      <TrackStatusPill
-                        value={latestFotaRecord.webStatus}
-                      />
+                      <TrackStatusPill value={latestFotaRecord.webStatus} />
                     </div>
                     <div className="flex items-baseline gap-2 mb-2">
                       <span className="text-sm font-mono font-semibold text-slate-800">
@@ -1669,9 +1389,7 @@ export default function DashboardPage() {
                     </div>
                     <div
                       className="text-[11px] text-slate-500 truncate"
-                      title={
-                        latestFotaRecord.webFotaUrl || "No archive"
-                      }
+                      title={latestFotaRecord.webFotaUrl || "No archive"}
                     >
                       Package:{" "}
                       <span className="font-mono text-slate-700">
@@ -1686,9 +1404,7 @@ export default function DashboardPage() {
                       <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                         FOTA Updater
                       </span>
-                      <TrackStatusPill
-                        value={latestFotaRecord.fotaStatus}
-                      />
+                      <TrackStatusPill value={latestFotaRecord.fotaStatus} />
                     </div>
                     <div className="flex items-baseline gap-2 mb-2">
                       <span className="text-sm font-mono font-semibold text-slate-800">
@@ -1701,9 +1417,7 @@ export default function DashboardPage() {
                     </div>
                     <div
                       className="text-[11px] text-slate-500 truncate"
-                      title={
-                        latestFotaRecord.fotaUpdateUrl || "No archive"
-                      }
+                      title={latestFotaRecord.fotaUpdateUrl || "No archive"}
                     >
                       Package:{" "}
                       <span className="font-mono text-slate-700">
@@ -1740,7 +1454,8 @@ export default function DashboardPage() {
                   No previous FOTA deployments recorded for this device.
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
-                  Configure versions and upload package archives above to deploy the initial release.
+                  Configure versions and upload package archives above to deploy
+                  the initial release.
                 </p>
               </div>
             )}
