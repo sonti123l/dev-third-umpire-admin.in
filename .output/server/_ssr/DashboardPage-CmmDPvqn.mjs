@@ -5,9 +5,12 @@ import { g as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
 import { n as getDevicesDetails, r as getFotaDetailsForDevice, t as AddDetailsIntoFotaDb } from "./dashboardService-DFj4idLN.mjs";
 import { n as useQuery, t as useMutation } from "../_libs/tanstack__react-query.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/DashboardPage-RqjSndWW.js
+import { t as require_lib } from "../_libs/jszip+[...].mjs";
+import "../_libs/7z-wasm.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/DashboardPage-CmmDPvqn.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
+var import_lib = /* @__PURE__ */ __toESM(require_lib());
 /**
 * Version utility functions for Semantic Versioning (SemVer)
 * validation, comparison, and manipulation.
@@ -124,19 +127,6 @@ function bumpVersion(currentVersion, type) {
 	const result = `${major}.${minor}.${patch}`;
 	return hasV ? `v${result}` : result;
 }
-var IconAlertCircle = ({ className = "w-4 h-4" }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", {
-	className,
-	fill: "none",
-	stroke: "currentColor",
-	viewBox: "0 0 24 24",
-	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", {
-		strokeLinecap: "round",
-		strokeLinejoin: "round",
-		strokeWidth: 2,
-		d: "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-	})
-});
-var ALLOWED_ARCHIVE_EXTENSIONS = [".zip", ".7z"];
 var IconServer = ({ className = "w-5 h-5" }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", {
 	className,
 	fill: "none",
@@ -305,6 +295,19 @@ var IconLogout = ({ className = "w-4 h-4" }) => /* @__PURE__ */ (0, import_jsx_r
 		d: "M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
 	})
 });
+var IconAlertCircle = ({ className = "w-4 h-4" }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", {
+	className,
+	fill: "none",
+	stroke: "currentColor",
+	viewBox: "0 0 24 24",
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", {
+		strokeLinecap: "round",
+		strokeLinejoin: "round",
+		strokeWidth: 2,
+		d: "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+	})
+});
+var ALLOWED_ARCHIVE_EXTENSIONS$1 = [".zip", ".7z"];
 function formatBytes(bytes) {
 	if (bytes === 0) return "0 B";
 	const k = 1024;
@@ -317,6 +320,13 @@ function formatBytes(bytes) {
 	const i = Math.floor(Math.log(bytes) / Math.log(k));
 	return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 }
+function StatusBadge({ status }) {
+	const isOnline = status?.toLowerCase() === "online";
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+		className: `inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${isOnline ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"}`,
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: `w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-500" : "bg-amber-500"}` }), status || "Unknown"]
+	});
+}
 function formatDate(dateStr) {
 	if (!dateStr) return "—";
 	return new Date(dateStr.endsWith("Z") ? dateStr : dateStr + "Z").toLocaleString("en-IN", {
@@ -326,13 +336,6 @@ function formatDate(dateStr) {
 		hour: "2-digit",
 		minute: "2-digit",
 		hour12: true
-	});
-}
-function StatusBadge({ status }) {
-	const isOnline = status?.toLowerCase() === "online";
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-		className: `inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${isOnline ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"}`,
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: `w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-500" : "bg-amber-500"}` }), status || "Unknown"]
 	});
 }
 function TrackStatusPill({ value }) {
@@ -364,7 +367,7 @@ function FileUploadZone({ file, onFileChange, disabled, label, dragActive, onDra
 		const dropped = e.dataTransfer.files?.[0];
 		if (!dropped) return;
 		const name = dropped.name.toLowerCase();
-		if (!ALLOWED_ARCHIVE_EXTENSIONS.some((ext) => name.endsWith(ext))) {
+		if (!ALLOWED_ARCHIVE_EXTENSIONS$1.some((ext) => name.endsWith(ext))) {
 			toast.error("Please drop a .zip or .7z file");
 			return;
 		}
@@ -372,7 +375,7 @@ function FileUploadZone({ file, onFileChange, disabled, label, dragActive, onDra
 		dt.items.add(dropped);
 		onFileChange({ target: { files: dt.files } });
 	};
-	if (file) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+	if (file) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-4 py-3",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 			className: "flex items-center gap-3 min-w-0",
@@ -394,7 +397,7 @@ function FileUploadZone({ file, onFileChange, disabled, label, dragActive, onDra
 			className: "p-1.5 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-600",
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconX, {})
 		})]
-	});
+	}) });
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", {
 		onDragOver: handleDragOver,
 		onDragLeave: handleDragLeave,
@@ -427,6 +430,21 @@ function FileUploadZone({ file, onFileChange, disabled, label, dragActive, onDra
 		})]
 	});
 }
+var ALLOWED_ARCHIVE_EXTENSIONS = [".zip", ".7z"];
+/**
+* Read one file from a ZIP archive.
+* Returns the selected file as bytes.
+*/
+async function readZipFile(archive, internalPath) {
+	const zip = await import_lib.default.loadAsync(archive);
+	const targetPath = internalPath.toLowerCase().replace(/\\/g, "/");
+	const matchedPath = Object.keys(zip.files).find((path) => path.toLowerCase() === targetPath);
+	if (!matchedPath || zip.files[matchedPath].dir) throw new Error(`File not found in ZIP: ${internalPath}`);
+	const match = (await zip.files[matchedPath].async("text")).match(/^\s*WEB_CURRENT_VERSION\s*=\s*(['"])(.*?)\1\s*$/m);
+	if (!match) throw new Error("WEB_VERSION variable not found in Python file");
+	return match[2];
+}
+var FiXED_FILE_SIZE = 5 * 1024 * 1024;
 function DashboardPage() {
 	const { user, logout } = useAuth();
 	const navigate = useNavigate();
@@ -458,6 +476,9 @@ function DashboardPage() {
 	const [webZipFile, setWebZipFile] = (0, import_react.useState)(null);
 	const [fotaZipFile, setFotaZipFile] = (0, import_react.useState)(null);
 	const [dragActiveZone, setDragActiveZone] = (0, import_react.useState)(null);
+	const [allowedFileSize, setAllowedFileSize] = (0, import_react.useState)(false);
+	const [device_image_version, set_device_image_version] = (0, import_react.useState)(null);
+	const [web_image_version, set_web_image_version] = (0, import_react.useState)(null);
 	const { data: devicesData, isLoading: isDevicesLoading, isError: isDevicesError, error: devicesError } = useQuery({
 		queryKey: ["devices", fota_update_server_id],
 		queryFn: async () => {
@@ -588,17 +609,75 @@ function DashboardPage() {
 			[field]: value
 		}));
 	};
-	const handleFileChange = (setter) => (e) => {
-		const file = e.target.files?.[0] ?? null;
-		const fileName = file?.name.toLowerCase() ?? "";
-		const isAllowed = ALLOWED_ARCHIVE_EXTENSIONS.some((ext) => fileName.endsWith(ext));
-		if (file && !isAllowed) {
+	const handleFileChange = (setter, component) => async (e) => {
+		let file = e.target.files?.[0] ?? null;
+		if (!file) {
+			setter(null);
+			return;
+		}
+		const fileName = file.name.toLowerCase();
+		const fileExtension = fileName.split(".").pop() ?? "";
+		const fileSize = file.size;
+		if (!ALLOWED_ARCHIVE_EXTENSIONS.some((ext) => fileName.endsWith(ext))) {
 			toast.error("Please select a .zip or .7z file");
 			e.target.value = "";
 			setter(null);
 			return;
 		}
-		setter(file);
+		if (fileSize > FiXED_FILE_SIZE) {
+			toast.error(`File size exceeds limit ${FiXED_FILE_SIZE}`);
+			setAllowedFileSize(false);
+			e.target.value = "";
+			setter(null);
+			return;
+		}
+		setAllowedFileSize(true);
+		try {
+			if (fileExtension === "zip") {
+				let version;
+				if (component === "device") {
+					version = await readZipFile(file, "TU_APP_IPC.py");
+					set_device_image_version(version);
+					setFotaForm((prev) => ({
+						...prev,
+						device_new_version: version
+					}));
+				} else if (component === "web") {
+					version = await readZipFile(file, "TU_web/TU_Web_IPC.py");
+					set_web_image_version(version);
+					setFotaForm((prev) => ({
+						...prev,
+						web_new_version: version
+					}));
+				}
+			} else {
+				toast.error("Only ZIP files are supported for version extraction.");
+				e.target.value = "";
+				setter(null);
+				return;
+			}
+			setter(file);
+			toast.success(`${component === "web" ? "Web" : component === "device" ? "Device" : "FOTA"} version detected`);
+		} catch (error) {
+			console.error("Failed to read version from ZIP:", error);
+			toast.error(error instanceof Error ? error.message : "Failed to read version from ZIP");
+			e.target.value = "";
+			setter(null);
+			if (component === "device") {
+				set_device_image_version(null);
+				setFotaForm((prev) => ({
+					...prev,
+					device_new_version: ""
+				}));
+			} else if (component === "web") {
+				set_web_image_version(null);
+				setFotaForm((prev) => ({
+					...prev,
+					web_new_version: ""
+				}));
+			}
+			return;
+		}
 	};
 	const handleSubmit = async () => {
 		if (!fotaForm.device_id) {
@@ -924,7 +1003,8 @@ function DashboardPage() {
 												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconCheck, { className: "w-3.5 h-3.5 shrink-0 text-emerald-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
 													"Valid upgrade: ",
 													fotaForm.device_old_version || "0.0.0",
-													" → ",
+													" ",
+													"→ ",
 													fotaForm.device_new_version
 												] })]
 											}),
@@ -976,7 +1056,7 @@ function DashboardPage() {
 												children: "Package Archive"
 											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileUploadZone, {
 												file: deviceZipFile,
-												onFileChange: handleFileChange(setDeviceZipFile),
+												onFileChange: handleFileChange(setDeviceZipFile, "device"),
 												disabled: !fotaForm.device_id,
 												label: "device",
 												dragActive: dragActiveZone === "device",
@@ -1035,7 +1115,7 @@ function DashboardPage() {
 														type: "text",
 														value: fotaForm.web_new_version,
 														onChange: (e) => handleVersionChange("web_new_version", e.target.value),
-														disabled: !fotaForm.device_id,
+														disabled: !fotaForm.device_id || fotaForm.web_new_version ? true : false,
 														placeholder: "e.g. 2.0.0 or v2.0.0",
 														className: `h-10 px-3 w-full bg-white border rounded-lg text-sm font-mono font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none transition-all disabled:bg-slate-50 disabled:cursor-not-allowed ${fotaForm.web_new_version ? webValidation.isValid && webValidation.isGreater ? "border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 bg-emerald-50/20" : "border-rose-400 focus:ring-2 focus:ring-rose-500/20 bg-rose-50/20" : "border-slate-200 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"}`
 													})] })
@@ -1050,7 +1130,8 @@ function DashboardPage() {
 												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconCheck, { className: "w-3.5 h-3.5 shrink-0 text-emerald-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
 													"Valid upgrade: ",
 													fotaForm.web_old_version || "0.0.0",
-													" → ",
+													" →",
+													" ",
 													fotaForm.web_new_version
 												] })]
 											}),
@@ -1102,7 +1183,7 @@ function DashboardPage() {
 												children: "Package Archive"
 											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileUploadZone, {
 												file: webZipFile,
-												onFileChange: handleFileChange(setWebZipFile),
+												onFileChange: handleFileChange(setWebZipFile, "web"),
 												disabled: !fotaForm.device_id,
 												label: "web",
 												dragActive: dragActiveZone === "web",
@@ -1176,7 +1257,8 @@ function DashboardPage() {
 												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(IconCheck, { className: "w-3.5 h-3.5 shrink-0 text-emerald-500" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
 													"Valid upgrade: ",
 													fotaForm.fota_old_version || "0.0.0",
-													" → ",
+													" →",
+													" ",
 													fotaForm.fota_new_version
 												] })]
 											}),
@@ -1228,7 +1310,7 @@ function DashboardPage() {
 												children: "Package Archive"
 											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileUploadZone, {
 												file: fotaZipFile,
-												onFileChange: handleFileChange(setFotaZipFile),
+												onFileChange: handleFileChange(setFotaZipFile, "fota"),
 												disabled: !fotaForm.device_id,
 												label: "fota",
 												dragActive: dragActiveZone === "fota",

@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-CQSWVoIU.js";import{T as t}from"./index-Bn5rIujQ.js";var n=e();function r(){let{id:e}=t({strict:!1});return(0,n.jsx)(`div`,{})}function i(){return(0,n.jsx)(`div`,{children:(0,n.jsx)(r,{})})}export{i as component};
